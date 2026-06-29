@@ -3,16 +3,17 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { Prisma } from "@prisma/client";
 
 export async function toggleFollow(targetUserId: string, currentPath: string = "/home") {
   const session = await auth();
   if (!session?.user?.id) throw new Error("Unauthorized");
-  
+
   const currentUserId = session.user.id;
   if (currentUserId === targetUserId) throw new Error("Cannot follow yourself");
 
   let followed = false;
-  
+
   await prisma.$transaction(async (tx) => {
     const existingFollow = await tx.follower.findUnique({
       where: {
@@ -22,7 +23,7 @@ export async function toggleFollow(targetUserId: string, currentPath: string = "
         },
       },
     });
-    
+
     if (existingFollow) {
       // Unfollow
       await tx.follower.delete({
@@ -64,7 +65,7 @@ export async function toggleFollow(targetUserId: string, currentPath: string = "
           },
         });
       }
-      
+
       followed = true;
     }
   });
@@ -72,6 +73,6 @@ export async function toggleFollow(targetUserId: string, currentPath: string = "
   // Revalidate the entire application layout to ensure all components 
   // (Home, Profile, Suggestions, Notifications, Search) are in sync.
   revalidatePath("/", "layout");
-  
+
   return { followed };
 }
