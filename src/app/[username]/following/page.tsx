@@ -30,7 +30,7 @@ export default async function FollowingPage({ params }: { params: Promise<{ user
     },
   });
 
-  const formattedUsers = following.map((f) => {
+  const formattedUsers = following.map((f: { following: { id: string; profile: { username: string; displayName: string | null; avatarUrl: string | null } | null; followers: { length: number }; following: { length: number } } }) => {
     const u = f.following;
     return {
       id: u.id,
