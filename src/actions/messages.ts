@@ -247,7 +247,7 @@ export async function sendMessage(
   // Create notifications
   if (recipientIds.length > 0) {
     await prisma.notification.createMany({
-      data: recipientIds.map((rId) => ({
+      data: recipientIds.map((rId: string) => ({
         userId: rId,
         actorId: session.user!.id,
         type: "MESSAGE",
