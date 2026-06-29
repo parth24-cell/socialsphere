@@ -169,7 +169,7 @@ export async function sendMessage(
   });
 
   if (conversation?.type === "DIRECT") {
-    const recipient = conversation.members.find(m => m.userId !== session.user!.id);
+    const recipient = conversation.members.find((m: { userId: string; status: string }) => m.userId !== session.user!.id);
     if (recipient) {
       const followsSender = await prisma.follower.findUnique({
         where: {
@@ -241,8 +241,8 @@ export async function sendMessage(
   });
 
   const recipientIds = conversation?.members
-    .filter(m => m.userId !== session.user!.id)
-    .map(m => m.userId) || [];
+    .filter((m: { userId: string }) => m.userId !== session.user!.id)
+    .map((m: { userId: string }) => m.userId) || [];
 
   // Create notifications
   if (recipientIds.length > 0) {
@@ -309,7 +309,7 @@ export async function handleMessageRequest(conversationId: string, action: "ACCE
       where: { id: conversationId },
       include: { members: true },
     });
-    const sender = conv?.members.find(m => m.userId !== session.user!.id);
+    const sender = conv?.members.find((m: { userId: string }) => m.userId !== session.user!.id);
     
     if (sender) {
       await prisma.blockedUser.upsert({

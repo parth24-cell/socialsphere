@@ -14,61 +14,59 @@ export async function toggleFollow(targetUserId: string, currentPath: string = "
 
   let followed = false;
 
-  await prisma.$transaction(async (tx) => {
-    const existingFollow = await tx.follower.findUnique({
+  const existingFollow = await prisma.follower.findUnique({
+    where: {
+      followerId_followingId: {
+        followerId: currentUserId,
+        followingId: targetUserId,
+      },
+    },
+  });
+
+  if (existingFollow) {
+    // Unfollow
+    await prisma.follower.delete({
       where: {
         followerId_followingId: {
           followerId: currentUserId,
-          followingId: targetUserId,
-        },
+          followingId: targetUserId
+        }
+      }
+    });
+    followed = false;
+  } else {
+    // Follow
+    await prisma.follower.create({
+      data: {
+        followerId: currentUserId,
+        followingId: targetUserId,
       },
     });
 
-    if (existingFollow) {
-      // Unfollow
-      await tx.follower.delete({
-        where: {
-          followerId_followingId: {
-            followerId: currentUserId,
-            followingId: targetUserId
-          }
+    // Create a notification if one hasn't been created recently (prevent duplicate spam)
+    const existingNotification = await prisma.notification.findFirst({
+      where: {
+        userId: targetUserId,
+        actorId: currentUserId,
+        type: "FOLLOW",
+        createdAt: {
+          gte: new Date(Date.now() - 24 * 60 * 60 * 1000) // Within 24 hours
         }
-      });
-      followed = false;
-    } else {
-      // Follow
-      await tx.follower.create({
+      }
+    });
+
+    if (!existingNotification) {
+      await prisma.notification.create({
         data: {
-          followerId: currentUserId,
-          followingId: targetUserId,
+          userId: targetUserId, // Receiver
+          actorId: currentUserId, // Sender
+          type: "FOLLOW",
         },
       });
-
-      // Create a notification if one hasn't been created recently (prevent duplicate spam)
-      const existingNotification = await tx.notification.findFirst({
-        where: {
-          userId: targetUserId,
-          actorId: currentUserId,
-          type: "FOLLOW",
-          createdAt: {
-            gte: new Date(Date.now() - 24 * 60 * 60 * 1000) // Within 24 hours
-          }
-        }
-      });
-
-      if (!existingNotification) {
-        await tx.notification.create({
-          data: {
-            userId: targetUserId, // Receiver
-            actorId: currentUserId, // Sender
-            type: "FOLLOW",
-          },
-        });
-      }
-
-      followed = true;
     }
-  });
+
+    followed = true;
+  }
 
   // Revalidate the entire application layout to ensure all components 
   // (Home, Profile, Suggestions, Notifications, Search) are in sync.
