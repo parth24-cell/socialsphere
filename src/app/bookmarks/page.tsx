@@ -25,7 +25,7 @@ export default async function BookmarksPage() {
     },
   });
 
-  const posts = bookmarks.map(b => b.post);
+  const posts = bookmarks.map((b: { post: any }) => b.post);
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex justify-center">
