@@ -3,7 +3,7 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { Prisma } from "@prisma/client";
+
 
 export async function toggleFollow(targetUserId: string, currentPath: string = "/home") {
   const session = await auth();
@@ -14,7 +14,7 @@ export async function toggleFollow(targetUserId: string, currentPath: string = "
 
   let followed = false;
 
-  await prisma.$transaction(async (tx: any) => {
+  await prisma.$transaction(async (tx) => {
     const existingFollow = await tx.follower.findUnique({
       where: {
         followerId_followingId: {
