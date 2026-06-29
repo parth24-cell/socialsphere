@@ -14,7 +14,7 @@ export async function toggleFollow(targetUserId: string, currentPath: string = "
 
   let followed = false;
 
-  await prisma.$transaction(async (tx) => {
+  await prisma.$transaction(async (tx: any) => {
     const existingFollow = await tx.follower.findUnique({
       where: {
         followerId_followingId: {
