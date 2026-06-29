@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Search } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { socket } from "@/lib/socket";
+
 
 export default function ConversationSidebar({ 
   rooms, 
@@ -18,20 +18,7 @@ export default function ConversationSidebar({
   const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
   const pathname = usePathname();
 
-  useEffect(() => {
-    socket.on("user_online", (userId: string) => {
-      setOnlineUsers((prev) => (prev.includes(userId) ? prev : [...prev, userId]));
-    });
 
-    socket.on("user_offline", (userId: string) => {
-      setOnlineUsers((prev) => prev.filter((id) => id !== userId));
-    });
-
-    return () => {
-      socket.off("user_online");
-      socket.off("user_offline");
-    };
-  }, []);
 
   const filteredRooms = rooms.filter(room => {
     const member = room.members.find((p: any) => p.userId === currentUserId);

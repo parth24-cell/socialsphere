@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { UserPlus, Heart, MessageCircle, Trash2, Loader2, Mail } from "lucide-react";
 import { getNotifications, deleteNotification, getNotificationTargetUrl, markAsRead } from "@/actions/notification";
@@ -29,6 +29,18 @@ export default function NotificationsList({ initialData }: { initialData: any[] 
     fetchFiltered();
   }, [filter]);
 
+  const loadMore = useCallback(async () => {
+    if (loading || !hasMore) return;
+    setLoading(true);
+    const cursor = notifications[notifications.length - 1]?.id;
+    const more = await getNotifications(cursor, filter);
+    if (more.length < 20) {
+      setHasMore(false);
+    }
+    setNotifications((prev) => [...prev, ...more]);
+    setLoading(false);
+  }, [loading, hasMore, notifications, filter]);
+
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
       if (entries[0].isIntersecting && hasMore && !loading) {
@@ -39,19 +51,9 @@ export default function NotificationsList({ initialData }: { initialData: any[] 
       observer.observe(loadMoreRef.current);
     }
     return () => observer.disconnect();
-  }, [hasMore, loading, notifications]);
+  }, [hasMore, loading, loadMore]);
 
-  const loadMore = async () => {
-    if (loading || !hasMore) return;
-    setLoading(true);
-    const cursor = notifications[notifications.length - 1]?.id;
-    const more = await getNotifications(cursor, filter);
-    if (more.length < 20) {
-      setHasMore(false);
-    }
-    setNotifications((prev) => [...prev, ...more]);
-    setLoading(false);
-  };
+
 
   const handleDelete = async (e: React.MouseEvent, id: string) => {
     e.preventDefault();

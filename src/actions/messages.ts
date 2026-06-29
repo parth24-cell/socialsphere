@@ -539,9 +539,11 @@ export async function uploadMessageAttachments(formData: FormData) {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
+    const cloudinaryResourceType = file.type.startsWith("audio/") || file.type.startsWith("video/") ? "video" : "auto";
+
     const result = await new Promise<any>((resolve, reject) => {
       cloudinary.uploader
-        .upload_stream({ folder: "socialsphere_messages", resource_type: "auto", timeout: 60000 }, (error, result) => {
+        .upload_stream({ folder: "socialsphere_messages", resource_type: cloudinaryResourceType, timeout: 60000 }, (error, result) => {
           if (error) reject(error);
           else resolve(result);
         })

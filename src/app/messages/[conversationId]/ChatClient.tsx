@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { socket } from "@/lib/socket";
+
 import { 
   sendMessage, 
   markAsRead, 
@@ -153,111 +153,13 @@ export default function ChatClient({
     setShowScrollDown(scrollHeight - scrollTop - clientHeight > 400);
   };
 
-  // Real-time socket events
+  // Initial actions
   useEffect(() => {
     markAsRead(conversation.id);
 
-    socket.emit("join_conversation", conversation.id);
-
-    // Join room presence checks
-    socket.emit("join", currentUserId);
-
-    socket.on("new_message", (message) => {
-      setMessages((prev) => [...prev, message]);
-      markAsRead(conversation.id);
-      scrollToBottom();
-    });
-
-    socket.on("message_edited", (message) => {
-      setMessages((prev) => prev.map((m) => (m.id === message.id ? { ...m, ...message } : m)));
-    });
-
-    socket.on("message_deleted", ({ messageId, deletedForUsers, isDeleted }) => {
-      setMessages((prev) => 
-        prev.map((m) => 
-          m.id === messageId 
-            ? { 
-                ...m, 
-                deletedForUsers, 
-                isDeleted, 
-                content: isDeleted ? "This message was deleted." : m.content,
-                attachments: isDeleted ? [] : m.attachments,
-                voiceMessage: isDeleted ? null : m.voiceMessage
-              } 
-            : m
-        )
-      );
-    });
-
-    socket.on("message_reacted", ({ messageId, reactions }) => {
-      setMessages((prev) => prev.map((m) => (m.id === messageId ? { ...m, reactions } : m)));
-    });
-
-    socket.on("message_pinned", ({ messageId, isPinned, pinnedAt }) => {
-      setMessages((prev) => prev.map((m) => (m.id === messageId ? { ...m, isPinned, pinnedAt } : m)));
-    });
-
-    socket.on("typing", ({ userId }) => {
-      if (userId !== currentUserId) setIsOtherUserTyping(true);
-    });
-
-    socket.on("stop_typing", ({ userId }) => {
-      if (userId !== currentUserId) setIsOtherUserTyping(false);
-    });
-
-    socket.on("user_online", (userId) => {
-      if (userId === otherUser?.id) {
-        setIsOnline(true);
-        setIsIdle(false);
-      }
-    });
-
-    socket.on("user_offline", (userId) => {
-      if (userId === otherUser?.id) {
-        setIsOnline(false);
-        setOtherLastSeen(new Date().toISOString());
-      }
-    });
-
-    socket.on("user_idle_status", ({ userId, isIdle }) => {
-      if (userId === otherUser?.id) {
-        setIsIdle(isIdle);
-      }
-    });
-
-    // Detect if current user is idle
-    let idleTimeout: NodeJS.Timeout;
-    const resetIdleTimer = () => {
-      socket.emit("user_active", currentUserId);
-      clearTimeout(idleTimeout);
-      idleTimeout = setTimeout(() => {
-        socket.emit("user_idle", currentUserId);
-      }, 120000); // 2 minutes idle
-    };
-
-    window.addEventListener("mousemove", resetIdleTimer);
-    window.addEventListener("keydown", resetIdleTimer);
-
     // Initial check for online status
     setIsOnline(otherUser?.id && (Date.now() - new Date(otherUser.lastSeen || 0).getTime() < 60000));
-
-    return () => {
-      socket.emit("leave_conversation", conversation.id);
-      socket.off("new_message");
-      socket.off("message_edited");
-      socket.off("message_deleted");
-      socket.off("message_reacted");
-      socket.off("message_pinned");
-      socket.off("typing");
-      socket.off("stop_typing");
-      socket.off("user_online");
-      socket.off("user_offline");
-      socket.off("user_idle_status");
-      window.removeEventListener("mousemove", resetIdleTimer);
-      window.removeEventListener("keydown", resetIdleTimer);
-      clearTimeout(idleTimeout);
-    };
-  }, [conversation.id, currentUserId, otherUser?.id]);
+  }, [conversation.id, currentUserId, otherUser?.id, otherUser?.lastSeen]);
 
   // Typing event trigger
   const handleTyping = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -265,14 +167,12 @@ export default function ChatClient({
 
     if (!isTyping) {
       setIsTyping(true);
-      socket.emit("typing", { conversationId: conversation.id, userId: currentUserId });
     }
 
     if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
 
     typingTimeoutRef.current = setTimeout(() => {
       setIsTyping(false);
-      socket.emit("stop_typing", { conversationId: conversation.id, userId: currentUserId });
     }, 2000);
   };
 
@@ -326,8 +226,7 @@ export default function ChatClient({
 
       setUploadProgress(100);
 
-      // Realtime emit
-      socket.emit("send_message", { ...message, recipientIds });
+
 
       setMessages((prev) => [...prev, message]);
       setInput("");
@@ -411,8 +310,10 @@ export default function ChatClient({
       };
 
       mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: "audio/webm" });
-        const audioFile = new (globalThis as any).File([audioBlob], "voice.webm", { type: "audio/webm" }) as File;
+        const actualMimeType = mediaRecorder.mimeType || "audio/webm";
+        const ext = actualMimeType.includes("mp4") ? "mp4" : "webm";
+        const audioBlob = new Blob(audioChunksRef.current, { type: actualMimeType });
+        const audioFile = new (globalThis as any).File([audioBlob], `voice.${ext}`, { type: actualMimeType }) as File;
 
         setIsSending(true);
         try {
@@ -435,7 +336,7 @@ export default function ChatClient({
               voiceData
             );
 
-            socket.emit("send_message", { ...message, recipientIds });
+
             setMessages((prev) => [...prev, message]);
             setReplyToMessage(null);
             scrollToBottom();
@@ -507,7 +408,7 @@ export default function ChatClient({
 
     try {
       const updated = await editMessage(messageId, editInput.trim());
-      socket.emit("message_edit", { conversationId: conversation.id, message: updated });
+
       setMessages((prev) => prev.map((m) => (m.id === messageId ? updated : m)));
       setEditingMessageId(null);
       toast.success("Message edited");
@@ -520,12 +421,7 @@ export default function ChatClient({
   const handleDeleteMessage = async (messageId: string, type: "ME" | "EVERYONE") => {
     try {
       const res = await deleteMessage(messageId, type);
-      socket.emit("message_delete", {
-        conversationId: conversation.id,
-        messageId,
-        deletedForUsers: res.deletedForUsers ? JSON.stringify(res.deletedForUsers) : undefined,
-        isDeleted: res.isDeleted,
-      });
+
 
       if (res.isDeleted) {
         setMessages((prev) => 
@@ -554,11 +450,7 @@ export default function ChatClient({
   const handleAddReaction = async (messageId: string, emoji: string) => {
     try {
       const updatedReactions = await toggleReaction(messageId, emoji);
-      socket.emit("message_reaction", {
-        conversationId: conversation.id,
-        messageId,
-        reactions: updatedReactions,
-      });
+
       setMessages((prev) => 
         prev.map((m) => 
           m.id === messageId ? { ...m, reactions: updatedReactions } : m
@@ -574,12 +466,7 @@ export default function ChatClient({
   const handleTogglePin = async (messageId: string) => {
     try {
       const updated = await togglePin(messageId);
-      socket.emit("message_pin", {
-        conversationId: conversation.id,
-        messageId,
-        isPinned: updated.isPinned,
-        pinnedAt: updated.pinnedAt,
-      });
+
       setMessages((prev) =>
         prev.map((m) => (m.id === messageId ? { ...m, isPinned: updated.isPinned, pinnedAt: updated.pinnedAt } : m))
       );

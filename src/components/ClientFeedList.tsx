@@ -17,20 +17,7 @@ export default function ClientFeedList({
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const observerRef = useRef<IntersectionObserver | null>(null);
-  const lastPostElementRef = useCallback((node: HTMLDivElement) => {
-    if (isLoading) return;
-    if (observerRef.current) observerRef.current.disconnect();
-    
-    observerRef.current = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && hasMore) {
-        loadMorePosts();
-      }
-    });
-    
-    if (node) observerRef.current.observe(node);
-  }, [isLoading, hasMore]);
-
-  const loadMorePosts = async () => {
+  const loadMorePosts = useCallback(async () => {
     setIsLoading(true);
     try {
       const nextPage = page + 1;
@@ -51,7 +38,20 @@ export default function ClientFeedList({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [page]);
+
+  const lastPostElementRef = useCallback((node: HTMLDivElement) => {
+    if (isLoading) return;
+    if (observerRef.current) observerRef.current.disconnect();
+    
+    observerRef.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasMore) {
+        loadMorePosts();
+      }
+    });
+    
+    if (node) observerRef.current.observe(node);
+  }, [isLoading, hasMore, loadMorePosts]);
 
   if (posts.length === 0) {
     return (
