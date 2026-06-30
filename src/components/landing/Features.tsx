@@ -1,88 +1,91 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Sparkles, Image as ImageIcon, Users, MessageSquare, Shield, Search } from "lucide-react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { MessageSquare, Image as ImageIcon, Users, Shield, Sparkles, PenTool } from "lucide-react";
+import { useRef } from "react";
 
 const features = [
   {
-    title: "AI Feed",
-    description: "Smart algorithms that understand what you want to see, delivering perfectly curated content.",
-    icon: Sparkles
+    title: "Real-Time Messaging",
+    description: "Instant, ultra-low latency connections.",
+    icon: MessageSquare,
+    position: "md:col-start-1 md:col-span-4",
+    parallax: [50, -50]
   },
   {
     title: "Stories",
-    description: "Share fleeting moments with your community through high-quality 24-hour stories.",
-    icon: ImageIcon
+    description: "Share fleeting moments with high fidelity.",
+    icon: ImageIcon,
+    position: "md:col-start-8 md:col-span-5",
+    parallax: [100, -100]
   },
   {
     title: "Communities",
-    description: "Find your tribe. Join specialized groups tailored to your exact interests.",
-    icon: Users
+    description: "Find your tribe in specialized groups.",
+    icon: Users,
+    position: "md:col-start-3 md:col-span-4",
+    parallax: [30, -30]
   },
   {
-    title: "Real-Time Messaging",
-    description: "Connect instantly with friends through our ultra-low latency chat architecture.",
-    icon: MessageSquare
+    title: "Secure Authentication",
+    description: "Enterprise-grade security, protecting your data.",
+    icon: Shield,
+    position: "md:col-start-7 md:col-span-5",
+    parallax: [80, -80]
   },
   {
-    title: "Privacy First",
-    description: "Granular controls over who sees what. Your data remains yours, always.",
-    icon: Shield
+    title: "AI Discovery (Coming Soon)",
+    description: "Intelligent curation without the noise.",
+    icon: Sparkles,
+    position: "md:col-start-2 md:col-span-5",
+    parallax: [60, -60]
   },
   {
-    title: "Smart Search",
-    description: "Find posts, people, and topics instantly with our lightning-fast search engine.",
-    icon: Search
+    title: "Creator Tools (Coming Soon)",
+    description: "Everything you need to build your audience.",
+    icon: PenTool,
+    position: "md:col-start-8 md:col-span-4",
+    parallax: [40, -40]
   }
 ];
 
 export function Features() {
-  return (
-    <section id="features" className="relative py-40 z-20">
-      <div className="container mx-auto px-6 md:px-12">
-        <motion.div
-          initial={{ opacity: 0, y: 50, filter: "blur(10px)" }}
-          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
-          className="text-center max-w-3xl mx-auto mb-24"
-        >
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tighter text-white mb-6">
-            Everything you need. <br/> Nothing you don't.
-          </h2>
-          <p className="text-zinc-400 text-lg md:text-xl font-light">
-            A premium suite of tools designed to elevate your social experience without the clutter.
-          </p>
-        </motion.div>
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start end", "end start"]
+  });
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {features.map((feature, idx) => (
-            <motion.div
-              key={feature.title}
-              initial={{ opacity: 0, y: 40, scale: 0.95, filter: "blur(10px)" }}
-              whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ 
-                duration: 1, 
-                delay: idx * 0.1, 
-                ease: [0.16, 1, 0.3, 1] as [number, number, number, number]
-              }}
-              whileHover={{ 
-                y: -8, 
-                scale: 1.02,
-                transition: { duration: 0.4, ease: "easeOut" }
-              }}
-              className="group rounded-3xl bg-zinc-900/40 border border-white/5 p-8 backdrop-blur-xl transition-colors hover:bg-zinc-800/50 hover:border-white/10"
-            >
-              <div className="h-14 w-14 rounded-2xl bg-zinc-800/50 flex items-center justify-center mb-8 group-hover:scale-110 group-hover:bg-white/10 transition-all duration-500 ease-out">
-                <feature.icon className="h-7 w-7 text-zinc-300 group-hover:text-white transition-colors duration-500" />
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-3 tracking-tight">{feature.title}</h3>
-              <p className="text-zinc-400 leading-relaxed font-light">
-                {feature.description}
-              </p>
-            </motion.div>
-          ))}
+  return (
+    <section ref={containerRef} id="features" className="relative py-40 z-10 overflow-hidden">
+      <div className="container mx-auto px-6 md:px-12">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-y-16 md:gap-y-32 gap-x-6">
+          {features.map((feature, idx) => {
+            // eslint-disable-next-line react-hooks/rules-of-hooks
+            const y = useTransform(scrollYProgress, [0, 1], feature.parallax);
+            
+            return (
+              <motion.div
+                key={feature.title}
+                style={{ y }}
+                initial={{ opacity: 0, scale: 0.9, filter: "blur(10px)" }}
+                whileInView={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+                className={`${feature.position} group rounded-[2rem] bg-[#18181B]/80 border border-white/5 p-8 backdrop-blur-xl shadow-2xl transition-all hover:bg-[#18181B] hover:border-white/10 flex flex-col justify-between min-h-[250px]`}
+              >
+                <div className="h-12 w-12 rounded-full bg-[#111216] flex items-center justify-center mb-8 border border-white/5 group-hover:scale-110 group-hover:border-[#4F46E5]/30 transition-all duration-500 ease-out">
+                  <feature.icon className="h-5 w-5 text-[#06B6D4] group-hover:text-[#4F46E5] transition-colors duration-500" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-medium text-[#FAFAFA] mb-2">{feature.title}</h3>
+                  <p className="text-[#A1A1AA] font-light">
+                    {feature.description}
+                  </p>
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
       </div>
     </section>

@@ -1,30 +1,30 @@
+"use client";
+
+import { useState } from "react";
 import { Navbar } from "@/components/landing/Navbar";
-import { Lamp } from "@/components/landing/Lamp";
-import { Particles } from "@/components/landing/Particles";
-import { Spotlight } from "@/components/landing/Spotlight";
+import { LivingSphere } from "@/components/landing/LivingSphere";
+import { Loader } from "@/components/landing/Loader";
 import { Hero } from "@/components/landing/Hero";
 import { Features } from "@/components/landing/Features";
-import { LivePreview } from "@/components/landing/LivePreview";
-import { Stats } from "@/components/landing/Stats";
-import { Testimonials } from "@/components/landing/Testimonials";
-import { CTA } from "@/components/landing/CTA";
 import { Footer } from "@/components/landing/Footer";
+import { CTA } from "@/components/landing/CTA";
 
 export default function LandingPage() {
+  const [isLoaded, setIsLoaded] = useState(false);
+
   return (
-    <div className="min-h-screen bg-black text-white overflow-x-hidden font-sans selection:bg-indigo-500/30">
-      <Spotlight />
-      <Particles />
+    <div className="min-h-screen bg-[#09090B] text-[#FAFAFA] overflow-x-hidden font-sans selection:bg-[#4F46E5]/30">
+      {!isLoaded && <Loader onComplete={() => setIsLoaded(true)} />}
+      
       <Navbar />
       
+      {/* Background 3D Engine */}
+      <LivingSphere />
+      
       <main className="relative z-10 flex flex-col">
-        {/* Lamp is placed at the top of the main content */}
-        <Lamp />
-        <Hero />
+        <Hero isLoaded={isLoaded} />
         <Features />
-        <LivePreview />
-        <Stats />
-        <Testimonials />
+        {/* Keeping CTA and Footer, but they will sit at the bottom naturally */}
         <CTA />
       </main>
 
