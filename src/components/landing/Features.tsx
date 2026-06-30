@@ -72,16 +72,20 @@ export function Features() {
                 whileInView={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
                 viewport={{ once: true, margin: "-100px" }}
                 transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-                className={`${feature.position} group rounded-[2rem] bg-[#18181B]/80 border border-white/5 p-8 backdrop-blur-xl shadow-2xl transition-all hover:bg-[#18181B] hover:border-white/10 flex flex-col justify-between min-h-[250px]`}
+                className={`${feature.position} group relative overflow-hidden rounded-[2rem] bg-[#18181B]/40 bg-gradient-to-b from-white/[0.05] to-transparent border border-white/5 p-8 backdrop-blur-md shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] transition-all hover:bg-[#18181B]/60 hover:border-white/10 flex flex-col justify-between min-h-[250px] ring-1 ring-white/5 inset-0`}
               >
-                <div className="h-12 w-12 rounded-full bg-[#111216] flex items-center justify-center mb-8 border border-white/5 group-hover:scale-110 group-hover:border-[#4F46E5]/30 transition-all duration-500 ease-out">
-                  <feature.icon className="h-5 w-5 text-[#06B6D4] group-hover:text-[#4F46E5] transition-colors duration-500" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-medium text-[#FAFAFA] mb-2">{feature.title}</h3>
-                  <p className="text-[#A1A1AA] font-light">
-                    {feature.description}
-                  </p>
+                <div className="absolute inset-0 bg-gradient-to-br from-[#4F46E5]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                
+                <div className="relative z-10 flex flex-col h-full justify-between">
+                  <div className="h-12 w-12 rounded-full bg-[#111216]/80 flex items-center justify-center mb-8 border border-white/5 group-hover:scale-110 group-hover:border-[#4F46E5]/30 transition-all duration-500 ease-out shadow-inner">
+                    <feature.icon className="h-5 w-5 text-[#06B6D4] group-hover:text-[#4F46E5] transition-colors duration-500" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-medium text-[#FAFAFA] mb-2">{feature.title}</h3>
+                    <p className="text-[#A1A1AA] font-light">
+                      {feature.description}
+                    </p>
+                  </div>
                 </div>
               </motion.div>
             );

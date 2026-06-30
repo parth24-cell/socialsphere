@@ -242,15 +242,15 @@ function SphereNodes() {
 
 export function LivingSphere() {
   return (
-    <div className="fixed inset-0 z-0 pointer-events-auto bg-[#09090B]">
+    <div className="fixed inset-0 z-0 pointer-events-auto bg-[#030014]">
       {/* Background Ambience */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#4F46E5]/10 via-[#09090B] to-[#09090B] pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#4F46E5]/10 via-[#030014] to-[#030014] pointer-events-none" />
       <Canvas
         camera={{ position: [0, 0, 8], fov: 45 }}
         gl={{ antialias: true, alpha: true }}
         dpr={[1, 2]}
       >
-        <fog attach="fog" args={["#09090B", 5, 15]} />
+        <fog attach="fog" args={["#030014", 5, 15]} />
         <SphereNodes />
       </Canvas>
     </div>

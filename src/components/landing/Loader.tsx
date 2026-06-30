@@ -28,7 +28,7 @@ export function Loader({ onComplete }: { onComplete: () => void }) {
       initial={{ opacity: 1 }}
       animate={{ opacity: progress >= 100 ? 0 : 1 }}
       transition={{ duration: 1, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
-      className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#09090B]"
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#030014]"
       style={{ pointerEvents: progress >= 100 ? "none" : "auto" }}
     >
       <div className="relative flex flex-col items-center">

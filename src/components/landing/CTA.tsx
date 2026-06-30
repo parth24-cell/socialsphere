@@ -6,7 +6,7 @@ import { ArrowRight } from "lucide-react";
 
 export function CTA() {
   return (
-    <section className="relative py-32 z-20 overflow-hidden border-t border-white/5 bg-[#09090B]">
+    <section className="relative py-32 z-20 overflow-hidden border-t border-white/5 bg-[#030014]">
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-[400px] bg-[#4F46E5]/10 blur-[120px] rounded-full pointer-events-none" />
       
       <div className="container mx-auto px-6 md:px-12 text-center relative z-10">

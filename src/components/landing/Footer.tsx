@@ -5,7 +5,7 @@ import { Globe } from "lucide-react";
 
 export function Footer() {
   return (
-    <footer className="border-t border-white/5 bg-[#09090B] py-12 relative z-20">
+    <footer className="border-t border-white/5 bg-[#030014] py-12 relative z-20">
       <div className="container mx-auto px-6 md:px-12 flex flex-col md:flex-row justify-between items-center gap-6">
         
         <div className="flex items-center gap-2 text-[#FAFAFA]">

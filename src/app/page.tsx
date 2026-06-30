@@ -13,7 +13,7 @@ export default function LandingPage() {
   const [isLoaded, setIsLoaded] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#09090B] text-[#FAFAFA] overflow-x-hidden font-sans selection:bg-[#4F46E5]/30">
+    <div className="min-h-screen bg-[#030014] text-[#FAFAFA] overflow-x-hidden font-sans selection:bg-[#4F46E5]/30">
       {!isLoaded && <Loader onComplete={() => setIsLoaded(true)} />}
       
       <Navbar />
