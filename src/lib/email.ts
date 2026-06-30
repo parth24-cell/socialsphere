@@ -6,9 +6,7 @@ import LoginAlertEmail from "./email/templates/LoginAlertEmail";
 import * as React from "react";
 
 const resend = new Resend(process.env.RESEND_API_KEY || "re_dummy");
-
-const FROM_EMAIL = "SocialSphere <noreply@socialsphere.com>"; // Update with verified domain
-
+const FROM_EMAIL = process.env.NODE_ENV === "production" ? "SocialSphere <onboarding@resend.dev>" : "SocialSphere <onboarding@resend.dev>"; // Update with verified domain when available
 export async function sendOTPVerificationEmail(
   to: string,
   username: string,
