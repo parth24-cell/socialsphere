@@ -17,9 +17,23 @@ export async function getFeedPosts(page = 1, limit = 20) {
     orderBy: { createdAt: "desc" },
     take: limit,
     skip: (page - 1) * limit,
-    include: {
-      author: { select: { id: true, profile: true } },
-      images: true,
+    select: {
+      id: true,
+      content: true,
+      createdAt: true,
+      author: {
+        select: {
+          id: true,
+          profile: {
+            select: {
+              username: true,
+              displayName: true,
+              avatarUrl: true
+            }
+          }
+        }
+      },
+      images: { select: { url: true } },
       _count: { select: { likes: true, comments: true } },
       likes: { where: { userId: session.user.id }, select: { userId: true } },
       bookmarks: { where: { userId: session.user.id }, select: { userId: true } },
@@ -56,9 +70,23 @@ export async function getExplorePosts(page = 1, limit = 20) {
     orderBy: { createdAt: "desc" }, // Fetch by recent first before ranking
     take: limit,
     skip: (page - 1) * limit,
-    include: {
-      author: { select: { id: true, profile: true } },
-      images: true,
+    select: {
+      id: true,
+      content: true,
+      createdAt: true,
+      author: {
+        select: {
+          id: true,
+          profile: {
+            select: {
+              username: true,
+              displayName: true,
+              avatarUrl: true
+            }
+          }
+        }
+      },
+      images: { select: { url: true } },
       _count: { select: { likes: true, comments: true } },
       likes: { where: { userId: session.user.id }, select: { userId: true } },
       bookmarks: { where: { userId: session.user.id }, select: { userId: true } },

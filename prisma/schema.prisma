@@ -48,26 +48,26 @@ model User {
   mutedBy MutedUser[] @relation("Muted")
   muting  MutedUser[] @relation("Muter")
 
-  adminLogs     AdminLog[]
-  activityLogs  ActivityLog[]
-  searchHistory SearchHistory[]
-  story         Story[]
-  shares        Share[]
-  storyViews    StoryView[]
-  lastSeen      DateTime? @default(now())
+  adminLogs        AdminLog[]
+  activityLogs     ActivityLog[]
+  searchHistory    SearchHistory[]
+  story            Story[]
+  shares           Share[]
+  storyViews       StoryView[]
+  lastSeen         DateTime?         @default(now())
   messageReactions MessageReaction[]
 }
 
 model Profile {
-  id          String  @id @default(uuid())
-  userId      String  @unique
-  username    String  @unique
-  displayName String
-  bio         String?
-  avatarUrl   String?
-  coverUrl    String?
-  website     String?
-  location    String?
+  id                String    @id @default(uuid())
+  userId            String    @unique
+  username          String    @unique
+  displayName       String
+  bio               String?
+  avatarUrl         String?
+  coverUrl          String?
+  website           String?
+  location          String?
   usernameUpdatedAt DateTime?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -153,6 +153,8 @@ model Post {
   shares    Share[]
   hashtags  PostHashtag[]
   likes     Like[]
+
+  @@index([authorId])
 }
 
 model PostImage {
@@ -188,6 +190,8 @@ model Story {
 
   user  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   views StoryView[]
+
+  @@index([userId])
 }
 
 model StoryView {
@@ -268,6 +272,8 @@ model Follower {
   following User @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
 
   @@id([followerId, followingId])
+  @@index([followerId])
+  @@index([followingId])
 }
 
 model Hashtag {
@@ -322,24 +328,24 @@ model ConversationMember {
 }
 
 model Message {
-  id               String   @id @default(uuid())
-  conversationId   String
-  senderId         String
-  content          String?
-  createdAt        DateTime @default(now())
-  deletedFor       String? // JSON string of user IDs (Legacy)
-  deletedForUsers  String? // JSON string of user IDs (Delete for Me)
-  editedAt         DateTime?
-  deletedAt        DateTime?
-  isEdited         Boolean  @default(false)
-  isDeleted        Boolean  @default(false)
-  
+  id              String    @id @default(uuid())
+  conversationId  String
+  senderId        String
+  content         String?
+  createdAt       DateTime  @default(now())
+  deletedFor      String? // JSON string of user IDs (Legacy)
+  deletedForUsers String? // JSON string of user IDs (Delete for Me)
+  editedAt        DateTime?
+  deletedAt       DateTime?
+  isEdited        Boolean   @default(false)
+  isDeleted       Boolean   @default(false)
+
   replyToMessageId String?
   replyToMessage   Message?  @relation("MessageReplies", fields: [replyToMessageId], references: [id], onDelete: SetNull)
   replies          Message[] @relation("MessageReplies")
-  
-  isPinned         Boolean   @default(false)
-  pinnedAt         DateTime?
+
+  isPinned Boolean   @default(false)
+  pinnedAt DateTime?
 
   conversation Conversation        @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   sender       User                @relation(fields: [senderId], references: [id], onDelete: Cascade)
@@ -349,7 +355,7 @@ model Message {
 }
 
 model MessageAttachment {
-  id        String @id @default(uuid())
+  id        String  @id @default(uuid())
   messageId String
   url       String
   type      String
@@ -461,9 +467,8 @@ model SearchHistory {
 }
 
 model Analytics {
-  id         String   @id @default(uuid())
+  id         String  @id @default(uuid())
   metricName String
   value      Float
   dimensions String? // JSON
 }
-

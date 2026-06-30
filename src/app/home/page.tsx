@@ -25,9 +25,23 @@ export default async function HomePage() {
       },
       orderBy: { createdAt: "desc" },
       take: 20, // Fetch initial page
-      include: {
-        author: { select: { id: true, profile: true } },
-        images: true,
+      select: {
+        id: true,
+        content: true,
+        createdAt: true,
+        author: {
+          select: {
+            id: true,
+            profile: {
+              select: {
+                username: true,
+                displayName: true,
+                avatarUrl: true
+              }
+            }
+          }
+        },
+        images: { select: { url: true } },
         _count: { select: { likes: true, comments: true } },
         likes: { where: { userId: session.user.id }, select: { userId: true } },
         bookmarks: { where: { userId: session.user.id }, select: { userId: true } },
@@ -42,9 +56,23 @@ export default async function HomePage() {
         ]
       },
       orderBy: { createdAt: "asc" },
-      include: {
-        user: { select: { id: true, profile: true } },
-        views: { where: { viewerId: session.user.id } }
+      select: {
+        id: true,
+        mediaUrl: true,
+        expiresAt: true,
+        userId: true,
+        user: {
+          select: {
+            id: true,
+            profile: {
+              select: {
+                username: true,
+                avatarUrl: true
+              }
+            }
+          }
+        },
+        views: { where: { viewerId: session.user.id }, select: { viewerId: true } }
       }
     }),
     prisma.user.findMany({
