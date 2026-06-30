@@ -50,9 +50,21 @@ export default function StoriesBar({ storiesGroupedByUser, currentUserId, curren
 
   const userIds = Object.keys(storiesGroupedByUser);
 
+  // Sort userIds: Your story -> Unseen stories -> Seen stories
+  const sortedUserIds = [...userIds].sort((a, b) => {
+    if (a === currentUserId) return -1;
+    if (b === currentUserId) return 1;
+
+    const aAllViewed = storiesGroupedByUser[a].every(s => s.views && s.views.length > 0);
+    const bAllViewed = storiesGroupedByUser[b].every(s => s.views && s.views.length > 0);
+
+    if (aAllViewed === bAllViewed) return 0;
+    return aAllViewed ? 1 : -1;
+  });
+
   return (
     <>
-      <div className="flex gap-4 p-4 overflow-x-auto hide-scrollbar border-b border-zinc-200 dark:border-zinc-800">
+      <div className="flex gap-4 p-4 overflow-x-auto hide-scrollbar border-b border-zinc-200 dark:border-zinc-800 items-center">
         {/* Create Story Button */}
         <div className="flex flex-col items-center gap-1 shrink-0">
           <div 
@@ -77,8 +89,14 @@ export default function StoriesBar({ storiesGroupedByUser, currentUserId, curren
           <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Add Story</span>
         </div>
 
+        {sortedUserIds.length === 0 && (
+          <div className="text-sm text-zinc-500 dark:text-zinc-400 ml-4 font-medium">
+            No stories available
+          </div>
+        )}
+
         {/* Story Avatars */}
-        {userIds.map(userId => {
+        {sortedUserIds.map(userId => {
           const stories = storiesGroupedByUser[userId];
           const user = stories[0].user;
           const isMe = userId === currentUserId;
