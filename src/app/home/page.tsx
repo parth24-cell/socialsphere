@@ -51,14 +51,32 @@ export default async function HomePage() {
       where: {
         id: { not: session.user.id },
         followers: { none: { followerId: session.user.id } },
+        blockedBy: { none: { blockerId: session.user.id } },
+        blocking: { none: { blockedId: session.user.id } }
       },
-      take: 3,
-      include: { profile: true },
+      take: 30,
+      include: { 
+        profile: true,
+        _count: { select: { followers: true } }
+      },
     }),
     prisma.profile.findUnique({
       where: { userId: session.user.id }
     })
   ]);
+
+  // Sort suggested users: prefer those with profile pictures, then by follower count
+  const sortedSuggestedUsers = suggestedUsers.sort((a, b) => {
+    const aHasPic = a.profile?.avatarUrl ? 1 : 0;
+    const bHasPic = b.profile?.avatarUrl ? 1 : 0;
+    if (aHasPic !== bHasPic) {
+      return bHasPic - aHasPic; // Profile pic first
+    }
+    return (b._count?.followers || 0) - (a._count?.followers || 0); // Then by followers desc
+  });
+
+  const top10Suggested = sortedSuggestedUsers.slice(0, 10);
+  const top3Suggested = sortedSuggestedUsers.slice(0, 3);
 
   // Algorithmic Feed Ranking (Hacker News Gravity Formula)
   const rankedPosts = rawPosts.sort((a: any, b: any) => {
@@ -142,7 +160,11 @@ export default async function HomePage() {
             <ComposePost />
           </div>
           <div className="p-0 sm:p-4">
-            <ClientFeedList initialPosts={rankedPosts} currentUserId={session.user.id!} />
+            <ClientFeedList 
+              initialPosts={rankedPosts} 
+              currentUserId={session.user.id!} 
+              suggestedUsers={top10Suggested}
+            />
           </div>
         </main>
 
@@ -152,10 +174,10 @@ export default async function HomePage() {
           <div className="bg-white dark:bg-zinc-900 rounded-2xl p-4 border border-zinc-200 dark:border-zinc-800 shadow-sm mb-4">
             <h2 className="font-bold text-lg text-zinc-900 dark:text-zinc-50 mb-4">Who to follow</h2>
             <div className="space-y-4">
-              {suggestedUsers.length === 0 ? (
+              {top3Suggested.length === 0 ? (
                 <p className="text-sm text-zinc-500">No suggestions right now.</p>
               ) : (
-                suggestedUsers.map(u => (
+                top3Suggested.map(u => (
                   <div key={u.id} className="flex items-center justify-between gap-2">
                     <Link href={`/${u.profile?.username}`} className="flex items-center gap-2 flex-1 min-w-0">
                       <div className="w-10 h-10 rounded-full bg-zinc-200 dark:bg-zinc-800 overflow-hidden flex-shrink-0">
