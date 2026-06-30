@@ -7,6 +7,12 @@ export default async function Feed({ initialPosts }: { initialPosts?: any[] }) {
   if (!session?.user?.id) return null;
 
   const posts = initialPosts || await prisma.post.findMany({
+    where: {
+      OR: [
+        { authorId: session.user.id },
+        { author: { followers: { some: { followerId: session.user.id } } } }
+      ]
+    },
     orderBy: { createdAt: "desc" },
     include: {
       author: {
