@@ -1,27 +1,34 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { registerSchema } from "@/lib/validation";
+import { sendVerificationOTP } from "@/actions/auth-v2";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { email, password } = body;
-    let username = body.username;
-
-    if (!username || !email || !password) {
-      return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
+    
+    const result = registerSchema.safeParse(body);
+    if (!result.success) {
+      return NextResponse.json({ message: "Invalid input" }, { status: 400 });
     }
 
-    username = username.trim();
+    const { email, password, username, name } = result.data;
 
     // Check if user already exists
     const existingUser = await prisma.user.findFirst({
       where: {
         OR: [{ email }, { profile: { username } }],
       },
+      include: { profile: true }
     });
 
     if (existingUser) {
+      if (existingUser.email === email && existingUser.status === "PENDING") {
+        // User exists but is pending, resend OTP
+        await sendVerificationOTP(existingUser.email);
+        return NextResponse.json({ message: "User pending verification", userId: existingUser.id, pending: true }, { status: 200 });
+      }
       return NextResponse.json({ message: "User with this email or username already exists" }, { status: 409 });
     }
 
@@ -33,16 +40,24 @@ export async function POST(req: Request) {
       data: {
         email,
         passwordHash,
+        status: "PENDING",
         profile: {
           create: {
             username,
-            displayName: username,
+            displayName: name,
           },
         },
       },
     });
 
-    return NextResponse.json({ message: "User created successfully", user: { id: user.id, email: user.email } }, { status: 201 });
+    // Send OTP
+    const otpResult = await sendVerificationOTP(user.email);
+    
+    if (!otpResult.success) {
+      return NextResponse.json({ message: "User created but failed to send verification email.", userId: user.id }, { status: 500 });
+    }
+
+    return NextResponse.json({ message: "Verification required", userId: user.id, pending: true }, { status: 201 });
   } catch (error: any) {
     console.error("Registration error:", error);
     return NextResponse.json({ message: "Internal server error" }, { status: 500 });

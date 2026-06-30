@@ -14,7 +14,7 @@ model User {
   email        String   @unique
   passwordHash String?
   role         String   @default("USER") // USER, VERIFIED, MODERATOR, ADMIN
-  status       String   @default("ACTIVE") // ACTIVE, BANNED, SUSPENDED
+  status       String   @default("PENDING") // PENDING, ACTIVE, BANNED, SUSPENDED
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
@@ -39,6 +39,7 @@ model User {
 
   emailVerifications EmailVerification[]
   passwordResets     PasswordReset[]
+  authAttempts       AuthAttempt[]
 
   reportsMade Report[] @relation("Reporter")
 
@@ -116,11 +117,16 @@ model Device {
 }
 
 model EmailVerification {
-  id         String    @id @default(uuid())
-  userId     String
-  token      String    @unique
-  expiresAt  DateTime
-  verifiedAt DateTime?
+  id           String    @id @default(uuid())
+  userId       String
+  email        String
+  token        String    // Hashed OTP
+  expiresAt    DateTime
+  verifiedAt   DateTime?
+  attempts     Int       @default(0)
+  resends      Int       @default(0)
+  lastResentAt DateTime?
+  createdAt    DateTime  @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
@@ -471,4 +477,17 @@ model Analytics {
   metricName String
   value      Float
   dimensions String? // JSON
+}
+
+model AuthAttempt {
+  id        String   @id @default(uuid())
+  userId    String
+  ipAddress String?
+  userAgent String?
+  success   Boolean
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId, createdAt])
+  @@index([ipAddress, createdAt])
 }
