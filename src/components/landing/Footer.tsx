@@ -5,11 +5,11 @@ import { Globe } from "lucide-react";
 
 export function Footer() {
   return (
-    <footer className="border-t border-white/5 bg-[#030014] py-12 relative z-20">
+    <footer className="border-t border-white/5 bg-[#0A0A0A] py-12 relative z-20">
       <div className="container mx-auto px-6 md:px-12 flex flex-col md:flex-row justify-between items-center gap-6">
         
         <div className="flex items-center gap-2 text-[#FAFAFA]">
-          <Globe className="h-5 w-5 text-[#4F46E5]" />
+          <Globe className="h-5 w-5 text-[#F59E0B]" />
           <span className="font-medium tracking-wide">SocialSphere</span>
         </div>
 

@@ -25,7 +25,7 @@ export function Navbar() {
       <div className="container mx-auto px-6 md:px-12 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 text-[#FAFAFA] group relative z-10">
-          <Globe className="h-6 w-6 text-[#06B6D4] group-hover:text-[#4F46E5] transition-colors duration-500" />
+          <Globe className="h-6 w-6 text-[#FBBF24] group-hover:text-[#F59E0B] transition-colors duration-500" />
           <span className="text-lg font-medium tracking-wide">SocialSphere</span>
         </Link>
 
@@ -57,7 +57,7 @@ export function Navbar() {
         <div className="flex items-center gap-4 relative z-10">
           <Link
             href="/login"
-            className="text-sm font-medium text-[#FAFAFA] hover:text-[#4F46E5] transition-colors"
+            className="text-sm font-medium text-[#FAFAFA] hover:text-[#F59E0B] transition-colors"
           >
             Login
           </Link>

@@ -23,8 +23,8 @@ function SphereNodes() {
     const col = new Float32Array(PARTICLE_COUNT * 3);
     const vel = new Float32Array(PARTICLE_COUNT * 3);
 
-    const baseColor = new THREE.Color("#4F46E5"); // Accent
-    const highlightColor = new THREE.Color("#06B6D4"); // Highlight
+    const baseColor = new THREE.Color("#D97706"); // Amber 600
+    const highlightColor = new THREE.Color("#FDE68A"); // Amber 200
 
     for (let i = 0; i < PARTICLE_COUNT; i++) {
       // Math to distribute points spherically
@@ -242,15 +242,15 @@ function SphereNodes() {
 
 export function LivingSphere() {
   return (
-    <div className="fixed inset-0 z-0 pointer-events-auto bg-[#030014]">
+    <div className="fixed inset-0 z-0 pointer-events-auto bg-[#0A0A0A]">
       {/* Background Ambience */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#4F46E5]/10 via-[#030014] to-[#030014] pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#F59E0B]/5 via-[#0A0A0A] to-[#0A0A0A] pointer-events-none" />
       <Canvas
         camera={{ position: [0, 0, 8], fov: 45 }}
         gl={{ antialias: true, alpha: true }}
         dpr={[1, 2]}
       >
-        <fog attach="fog" args={["#030014", 5, 15]} />
+        <fog attach="fog" args={["#0A0A0A", 5, 15]} />
         <SphereNodes />
       </Canvas>
     </div>
