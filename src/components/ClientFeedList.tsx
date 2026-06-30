@@ -14,9 +14,15 @@ export default function ClientFeedList({
 }) {
   const [posts, setPosts] = useState(initialPosts);
   const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
+  const [hasMore, setHasMore] = useState(initialPosts.length === 20);
   const [isLoading, setIsLoading] = useState(false);
   const observerRef = useRef<IntersectionObserver | null>(null);
+
+  useEffect(() => {
+    setPosts(initialPosts);
+    setPage(1);
+    setHasMore(initialPosts.length === 20);
+  }, [initialPosts]);
   const loadMorePosts = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -55,8 +61,11 @@ export default function ClientFeedList({
 
   if (posts.length === 0) {
     return (
-      <div className="text-center p-8 text-zinc-500 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-900 shadow-sm">
-        No posts yet. Be the first to say something!
+      <div className="text-center p-8 text-zinc-500 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-900 shadow-sm flex flex-col items-center justify-center gap-4">
+        <p>Your feed is empty. Follow people to start seeing posts.</p>
+        <a href="/explore" className="px-4 py-2 bg-indigo-600 text-white rounded-full font-medium hover:bg-indigo-700 transition">
+          Find people to follow
+        </a>
       </div>
     );
   }

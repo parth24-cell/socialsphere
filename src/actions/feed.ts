@@ -8,6 +8,12 @@ export async function getFeedPosts(page = 1, limit = 20) {
   if (!session?.user?.id) throw new Error("Unauthorized");
 
   const rawPosts = await prisma.post.findMany({
+    where: {
+      OR: [
+        { authorId: session.user.id },
+        { author: { followers: { some: { followerId: session.user.id } } } }
+      ]
+    },
     orderBy: { createdAt: "desc" },
     take: limit,
     skip: (page - 1) * limit,

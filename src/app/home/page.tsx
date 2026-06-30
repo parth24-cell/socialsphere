@@ -17,6 +17,12 @@ export default async function HomePage() {
 
   const [rawPosts, activeStories, suggestedUsers, currentProfile] = await Promise.all([
     prisma.post.findMany({
+      where: {
+        OR: [
+          { authorId: session.user.id },
+          { author: { followers: { some: { followerId: session.user.id } } } }
+        ]
+      },
       orderBy: { createdAt: "desc" },
       take: 20, // Fetch initial page
       include: {
@@ -28,7 +34,13 @@ export default async function HomePage() {
       },
     }),
     prisma.story.findMany({
-      where: { expiresAt: { gt: new Date() } },
+      where: { 
+        expiresAt: { gt: new Date() },
+        OR: [
+          { userId: session.user.id },
+          { user: { followers: { some: { followerId: session.user.id } } } }
+        ]
+      },
       orderBy: { createdAt: "asc" },
       include: {
         user: { select: { id: true, profile: true } },

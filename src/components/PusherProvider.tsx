@@ -12,6 +12,15 @@ interface PusherContextType {
 
 const PusherContext = createContext<PusherContextType>({ pusherClient: null });
 
+interface NotificationPayload {
+  type: "LIKE" | "COMMENT" | "FOLLOW" | "MENTION" | "MESSAGE";
+  actor?: {
+    profile?: {
+      displayName?: string;
+    };
+  };
+}
+
 export const usePusher = () => useContext(PusherContext);
 
 export function PusherProvider({ children }: { children: ReactNode }) {
@@ -34,7 +43,7 @@ export function PusherProvider({ children }: { children: ReactNode }) {
     // E.g. likes, mentions, follows
     const channel = client.subscribe(`user-${currentUserId}`);
 
-    channel.bind("new-notification", (data: any) => {
+    channel.bind("new-notification", (data: NotificationPayload) => {
       // Refresh the current route to update server components (like unread badges)
       router.refresh();
 
@@ -46,15 +55,14 @@ export function PusherProvider({ children }: { children: ReactNode }) {
       if (data.type === "MENTION") message = "You were mentioned.";
 
       if (data.actor?.profile?.displayName) {
-        message = `${data.actor.profile.displayName} ${
-          data.type === "LIKE"
-            ? "liked your post"
-            : data.type === "COMMENT"
+        message = `${data.actor.profile.displayName} ${data.type === "LIKE"
+          ? "liked your post"
+          : data.type === "COMMENT"
             ? "commented on your post"
             : data.type === "FOLLOW"
-            ? "started following you"
-            : "mentioned you"
-        }.`;
+              ? "started following you"
+              : "mentioned you"
+          }.`;
       }
 
       toast(message, {
