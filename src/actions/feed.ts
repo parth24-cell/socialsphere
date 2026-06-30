@@ -7,12 +7,17 @@ export async function getFeedPosts(page = 1, limit = 20) {
   const session = await auth();
   if (!session?.user?.id) throw new Error("Unauthorized");
 
+  const followingRecords = await prisma.follower.findMany({
+    where: { followerId: session.user.id, status: "ACCEPTED" },
+    select: { followingId: true }
+  });
+  
+  const followedUserIds = followingRecords.map(record => record.followingId);
+  const allowedUserIds = [...followedUserIds, session.user.id];
+
   const rawPosts = await prisma.post.findMany({
     where: {
-      OR: [
-        { authorId: session.user.id },
-        { author: { followers: { some: { followerId: session.user.id } } } }
-      ]
+      authorId: { in: allowedUserIds }
     },
     orderBy: { createdAt: "desc" },
     take: limit,

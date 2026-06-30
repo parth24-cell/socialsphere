@@ -15,13 +15,19 @@ export default async function HomePage() {
     redirect("/login");
   }
 
+  // Fetch the list of users the current user follows
+  const followingRecords = await prisma.follower.findMany({
+    where: { followerId: session.user.id, status: "ACCEPTED" },
+    select: { followingId: true }
+  });
+  
+  const followedUserIds = followingRecords.map(record => record.followingId);
+  const allowedUserIds = [...followedUserIds, session.user.id];
+
   const [rawPosts, activeStories, suggestedUsers, currentProfile] = await Promise.all([
     prisma.post.findMany({
       where: {
-        OR: [
-          { authorId: session.user.id },
-          { author: { followers: { some: { followerId: session.user.id } } } }
-        ]
+        authorId: { in: allowedUserIds }
       },
       orderBy: { createdAt: "desc" },
       take: 20, // Fetch initial page
@@ -50,10 +56,7 @@ export default async function HomePage() {
     prisma.story.findMany({
       where: { 
         expiresAt: { gt: new Date() },
-        OR: [
-          { userId: session.user.id },
-          { user: { followers: { some: { followerId: session.user.id } } } }
-        ]
+        userId: { in: allowedUserIds }
       },
       orderBy: { createdAt: "asc" },
       select: {

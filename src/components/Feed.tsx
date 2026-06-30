@@ -6,12 +6,19 @@ export default async function Feed({ initialPosts }: { initialPosts?: any[] }) {
   const session = await auth();
   if (!session?.user?.id) return null;
 
+  let allowedUserIds = [session.user.id];
+  if (!initialPosts) {
+    const followingRecords = await prisma.follower.findMany({
+      where: { followerId: session.user.id, status: "ACCEPTED" },
+      select: { followingId: true }
+    });
+    const followedUserIds = followingRecords.map(record => record.followingId);
+    allowedUserIds = [...followedUserIds, session.user.id];
+  }
+
   const posts = initialPosts || await prisma.post.findMany({
     where: {
-      OR: [
-        { authorId: session.user.id },
-        { author: { followers: { some: { followerId: session.user.id } } } }
-      ]
+      authorId: { in: allowedUserIds }
     },
     orderBy: { createdAt: "desc" },
     include: {
