@@ -6,6 +6,7 @@ import { UserPlus, Heart, MessageCircle, Trash2, Loader2, Mail } from "lucide-re
 import { getNotifications, deleteNotification, getNotificationTargetUrl, markAsRead } from "@/actions/notification";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { usePusher } from "@/components/PusherProvider";
 
 export default function NotificationsList({ initialData }: { initialData: any[] }) {
   const [notifications, setNotifications] = useState(initialData);
@@ -14,8 +15,32 @@ export default function NotificationsList({ initialData }: { initialData: any[] 
   const [hasMore, setHasMore] = useState(initialData.length === 20);
   const [navigatingId, setNavigatingId] = useState<string | null>(null);
   const router = useRouter();
+  const { pusherClient } = usePusher();
 
   const loadMoreRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!pusherClient) return;
+    
+    // Bind globally on the existing connection channel if possible
+    // Note: The global provider already subscribes to `user-${currentUserId}` and binds `new-notification`.
+    // But we need local state updates. We can bind another handler.
+    const channelName = Object.keys(pusherClient.channels.channels).find(name => name.startsWith("user-"));
+    if (channelName) {
+      const channel = pusherClient.channel(channelName);
+      if (channel) {
+        const handleNewNotification = (data: any) => {
+          if (filter === "ALL" || filter === data.type) {
+            setNotifications((prev) => [data, ...prev]);
+          }
+        };
+        channel.bind("new-notification", handleNewNotification);
+        return () => {
+          channel.unbind("new-notification", handleNewNotification);
+        };
+      }
+    }
+  }, [pusherClient, filter]);
 
   useEffect(() => {
     // Reset when filter changes

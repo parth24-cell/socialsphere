@@ -254,6 +254,24 @@ export async function sendMessage(
         entityId: conversationId,
       })),
     });
+
+    // Trigger real-time notifications for all recipients
+    try {
+      const { pusherServer } = await import("@/lib/pusher");
+      await Promise.all(
+        recipientIds.map((rId: string) =>
+          pusherServer.trigger(`user-${rId}`, "new-notification", {
+            type: "MESSAGE",
+            entityId: conversationId,
+            actor: {
+              profile: { displayName: "Someone" } // Simplified for now since actor isn't eagerly fetched
+            }
+          })
+        )
+      );
+    } catch (e) {
+      console.error("Pusher error:", e);
+    }
   }
 
   revalidatePath(`/messages/${conversationId}`);

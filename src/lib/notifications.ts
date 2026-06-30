@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { pusherServer } from "@/lib/pusher";
 
 export async function createNotification({
   userId,
@@ -13,12 +14,35 @@ export async function createNotification({
 }) {
   if (userId === actorId) return null; // Don't notify self
 
-  return prisma.notification.create({
+  const notification = await prisma.notification.create({
     data: {
       userId,
       actorId,
       type,
       entityId,
     },
+    include: {
+      actor: {
+        select: {
+          id: true,
+          profile: {
+            select: {
+              displayName: true,
+              username: true,
+              avatarUrl: true,
+            },
+          },
+        },
+      },
+    },
   });
+
+  // Trigger real-time event
+  try {
+    await pusherServer.trigger(`user-${userId}`, "new-notification", notification);
+  } catch (error) {
+    console.error("Failed to trigger Pusher notification:", error);
+  }
+
+  return notification;
 }
