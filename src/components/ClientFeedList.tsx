@@ -11,11 +11,13 @@ import FollowButton from "./FollowButton";
 export default function ClientFeedList({ 
   initialPosts, 
   currentUserId,
-  suggestedUsers = []
+  suggestedUsers = [],
+  fetchNextPage = getFeedPosts
 }: { 
   initialPosts: any[], 
   currentUserId: string,
-  suggestedUsers?: any[]
+  suggestedUsers?: any[],
+  fetchNextPage?: (page: number) => Promise<any[]>
 }) {
   const [posts, setPosts] = useState(initialPosts);
   const [page, setPage] = useState(1);
@@ -33,7 +35,7 @@ export default function ClientFeedList({
     setIsLoading(true);
     try {
       const nextPage = page + 1;
-      const newPosts = await getFeedPosts(nextPage);
+      const newPosts = await fetchNextPage(nextPage);
       
       if (newPosts.length === 0) {
         setHasMore(false);

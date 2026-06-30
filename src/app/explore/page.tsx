@@ -3,7 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Compass } from "lucide-react";
-import PostCard from "@/components/PostCard";
+import { getExplorePosts } from "@/actions/feed";
+import ClientFeedList from "@/components/ClientFeedList";
 
 export const revalidate = 60; // Cache page for 60 seconds
 
@@ -11,22 +12,8 @@ export default async function ExplorePage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
 
-  // Fetch top 50 posts by most likes, excluding user's own posts
-  const trendingPosts = await prisma.post.findMany({
-    where: {
-      authorId: { not: session.user.id }
-    },
-    orderBy: {
-      likes: { _count: 'desc' }
-    },
-    take: 50,
-    include: {
-      author: { select: { id: true, profile: true } },
-      images: true,
-      _count: { select: { likes: true, comments: true } },
-      likes: { where: { userId: session.user.id }, select: { userId: true } },
-    },
-  });
+  // Fetch initial explore posts
+  const trendingPosts = await getExplorePosts(1, 20);
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex justify-center">
@@ -51,14 +38,12 @@ export default async function ExplorePage() {
         </div>
 
         {/* Feed */}
-        <div className="p-4 space-y-4">
-          {trendingPosts.length === 0 ? (
-            <div className="text-center py-10 text-zinc-500">Nothing trending yet.</div>
-          ) : (
-            trendingPosts.map((post: any) => (
-              <PostCard key={post.id} post={post as any} currentUserId={session?.user?.id!} />
-            ))
-          )}
+        <div className="p-4">
+          <ClientFeedList 
+            initialPosts={trendingPosts} 
+            currentUserId={session.user.id} 
+            fetchNextPage={getExplorePosts}
+          />
         </div>
       </main>
     </div>
