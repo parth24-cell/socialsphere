@@ -14,7 +14,7 @@ export default function LandingPage() {
 
   return (
     <SphereProvider>
-      <div className="min-h-screen bg-[#0A0A0A] text-[#FAFAFA] overflow-x-hidden font-sans selection:bg-[#F59E0B]/30">
+      <div className="min-h-screen bg-[#020205] text-[#FAFAFA] overflow-x-hidden font-sans selection:bg-[#F59E0B]/30">
         {!isLoaded && <Loader onComplete={() => setIsLoaded(true)} />}
         
         <Navbar />

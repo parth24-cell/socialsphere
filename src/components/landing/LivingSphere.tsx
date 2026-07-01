@@ -421,20 +421,23 @@ function SphereNodes() {
 
 export function LivingSphere() {
   return (
-    <div className="fixed inset-0 z-0 pointer-events-auto bg-[#050505]">
+    <div className="fixed inset-0 z-0 pointer-events-auto bg-[#020205]">
       {/* Premium Cinematic Lighting Layers */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white/[0.03] via-transparent to-transparent pointer-events-none" />
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#050505]/50 to-[#050505] pointer-events-none" />
+      {/* Deep Navy/Purple Base Gradient */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#0A0A1F]/40 via-[#020205] to-[#010103] pointer-events-none" />
+      
+      {/* Subtle Blue/Purple Ambient Glow from bottom */}
+      <div className="absolute inset-0 bg-gradient-to-t from-[#100b2e]/30 via-transparent to-transparent pointer-events-none" />
       
       {/* Film Grain Texture overlay */}
-      <div className="absolute inset-0 opacity-[0.015] pointer-events-none" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }} />
+      <div className="absolute inset-0 opacity-[0.02] pointer-events-none mix-blend-overlay" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }} />
 
       <Canvas
         camera={{ position: [0, 0, 9], fov: 40 }}
         gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
         dpr={[1, 2]}
       >
-        <fog attach="fog" args={["#050505", 6, 16]} />
+        <fog attach="fog" args={["#020205", 6, 18]} />
         <SphereNodes />
       </Canvas>
     </div>

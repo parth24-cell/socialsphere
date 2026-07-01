@@ -32,15 +32,15 @@ export function CommunitiesShowcase() {
     >
       {/* Ambient Glow */}
       <motion.div 
-         className="absolute inset-0 bg-cyan-500/20 blur-[100px] rounded-full"
-         animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
+         className="absolute inset-0 bg-[#06b6d4]/10 blur-[120px] rounded-full"
+         animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.4, 0.2] }}
          transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
       />
       
-      {/* Parallax Container */}
+      {/* Container */}
       <motion.div 
         style={{ rotateX, rotateY }}
-        className="w-full h-full bg-black/40 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] shadow-2xl relative overflow-hidden z-10 flex items-center justify-center"
+        className="w-full h-full bg-[#020205]/40 backdrop-blur-2xl border border-white/5 border-t-white/10 border-l-white/10 rounded-[2.5rem] shadow-[0_0_50px_-12px_rgba(0,0,0,0.8)] overflow-hidden relative z-10 flex items-center justify-center"
       >
         <div className="absolute inset-0 bg-gradient-to-tl from-white/5 to-transparent pointer-events-none" />
 

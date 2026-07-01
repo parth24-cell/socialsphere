@@ -57,7 +57,7 @@ export function StoriesShowcase() {
     >
       {/* Ambient Glow */}
       <motion.div 
-         className="absolute inset-0 bg-blue-500/20 blur-[100px] rounded-full"
+         className="absolute inset-0 bg-[#3b82f6]/10 blur-[120px] rounded-full"
          animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.5, 0.2] }}
          transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
       />
@@ -65,7 +65,7 @@ export function StoriesShowcase() {
       {/* Phone Frame */}
       <motion.div 
         style={{ rotateX, rotateY }}
-        className="w-full h-full bg-black border border-white/10 rounded-[2.5rem] shadow-2xl overflow-hidden relative z-10 flex flex-col"
+        className="w-full h-full bg-[#020205]/40 backdrop-blur-2xl border border-white/5 border-t-white/10 border-l-white/10 rounded-[2.5rem] shadow-[0_0_50px_-12px_rgba(0,0,0,0.8)] overflow-hidden relative z-10 flex flex-col"
       >
          <AnimatePresence initial={false}>
             <motion.div 

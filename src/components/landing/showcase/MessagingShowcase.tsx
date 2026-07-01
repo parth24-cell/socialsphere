@@ -98,7 +98,7 @@ export function MessagingShowcase() {
     >
       {/* Ambient Glow */}
       <motion.div 
-         className="absolute inset-0 bg-purple-500/20 blur-[100px] rounded-full"
+         className="absolute inset-0 bg-[#a855f7]/10 blur-[120px] rounded-full"
          animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
       />
@@ -106,7 +106,7 @@ export function MessagingShowcase() {
       {/* Glass Container */}
       <motion.div 
         style={{ rotateX, rotateY }}
-        className="w-full h-full bg-black/40 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] p-4 shadow-2xl overflow-hidden relative z-10 flex flex-col"
+        className="w-full h-full bg-[#020205]/40 backdrop-blur-2xl border border-white/5 border-t-white/10 border-l-white/10 rounded-[2.5rem] p-4 shadow-[0_0_50px_-12px_rgba(0,0,0,0.8)] overflow-hidden relative z-10 flex flex-col"
       >
          <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
 

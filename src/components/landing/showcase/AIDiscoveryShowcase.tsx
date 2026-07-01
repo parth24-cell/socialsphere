@@ -26,26 +26,21 @@ export function AIDiscoveryShowcase() {
 
   return (
     <div 
-      className="relative w-full max-w-lg aspect-[4/5] flex items-center justify-center [perspective:1000px] mx-auto"
+      className="relative w-full max-w-lg aspect-video flex items-center justify-center [perspective:1000px] mx-auto"
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
       {/* Ambient Glow */}
       <motion.div 
-         className="absolute inset-0 bg-cyan-500/20 blur-[120px] rounded-full"
-         animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
-         transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div 
-         className="absolute inset-0 bg-amber-500/10 blur-[100px] rounded-full translate-x-10 translate-y-10"
-         animate={{ scale: [1.2, 1, 1.2], opacity: [0.2, 0.4, 0.2] }}
+         className="absolute inset-0 bg-white/5 blur-[120px] rounded-full"
+         animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
       />
       
-      {/* Parallax Container */}
+      {/* Container */}
       <motion.div 
         style={{ rotateX, rotateY }}
-        className="w-full h-full bg-black/40 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] p-6 shadow-2xl relative overflow-hidden z-10 flex flex-col gap-6"
+        className="w-full h-full bg-[#020205]/40 backdrop-blur-2xl border border-white/5 border-t-white/10 border-l-white/10 rounded-[2.5rem] p-6 shadow-[0_0_50px_-12px_rgba(0,0,0,0.8)] overflow-hidden relative z-10 flex flex-col gap-6"
       >
         <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
 
