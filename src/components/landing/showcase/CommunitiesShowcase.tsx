@@ -1,0 +1,102 @@
+"use client";
+
+import { motion, useMotionValue, useTransform } from "framer-motion";
+import { Users } from "lucide-react";
+
+export function CommunitiesShowcase() {
+  // Parallax Setup
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  const rotateX = useTransform(mouseY, [-500, 500], [5, -5]);
+  const rotateY = useTransform(mouseX, [-500, 500], [-5, 5]);
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left - rect.width / 2;
+    const y = e.clientY - rect.top - rect.height / 2;
+    mouseX.set(x);
+    mouseY.set(y);
+  };
+
+  const handleMouseLeave = () => {
+    mouseX.set(0);
+    mouseY.set(0);
+  };
+
+  return (
+    <div 
+      className="relative w-full max-w-lg aspect-square flex items-center justify-center [perspective:1000px] mx-auto"
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+    >
+      {/* Ambient Glow */}
+      <motion.div 
+         className="absolute inset-0 bg-cyan-500/20 blur-[100px] rounded-full"
+         animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
+         transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+      />
+      
+      {/* Parallax Container */}
+      <motion.div 
+        style={{ rotateX, rotateY }}
+        className="w-full h-full bg-black/40 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] shadow-2xl relative overflow-hidden z-10 flex items-center justify-center"
+      >
+        <div className="absolute inset-0 bg-gradient-to-tl from-white/5 to-transparent pointer-events-none" />
+
+        {/* SVG Connection Lines */}
+        <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full opacity-40">
+           <motion.circle 
+              cx="50" cy="50" r="30" 
+              fill="none" stroke="#06b6d4" strokeWidth="0.5" strokeDasharray="4 4" 
+              animate={{ rotate: 360 }} 
+              transition={{ duration: 30, repeat: Infinity, ease: "linear" }} 
+              style={{ transformOrigin: "50px 50px" }}
+           />
+           <motion.circle 
+              cx="50" cy="50" r="40" 
+              fill="none" stroke="#06b6d4" strokeWidth="0.2" strokeDasharray="2 6" 
+              animate={{ rotate: -360 }} 
+              transition={{ duration: 40, repeat: Infinity, ease: "linear" }} 
+              style={{ transformOrigin: "50px 50px" }}
+           />
+        </svg>
+
+        {/* Floating Avatars */}
+        {[...Array(6)].map((_, i) => {
+           const angle = (i / 6) * Math.PI * 2;
+           // Orbit radius
+           const r = i % 2 === 0 ? 30 : 40;
+           return (
+              <motion.div 
+                key={i}
+                className="absolute w-12 h-12 rounded-full border border-cyan-500/50 bg-black/80 backdrop-blur-md overflow-hidden flex items-center justify-center"
+                animate={{ 
+                   x: [Math.cos(angle) * r, Math.cos(angle + Math.PI) * r, Math.cos(angle) * r], 
+                   y: [Math.sin(angle) * r, Math.sin(angle + Math.PI) * r, Math.sin(angle) * r],
+                   scale: [1, 1.1, 1]
+                }}
+                transition={{ duration: 15 + i * 2, repeat: Infinity, ease: "linear" }}
+                style={{
+                   // Convert relative SVG space to absolute percentage roughly
+                   left: "calc(50% - 24px)",
+                   top: "calc(50% - 24px)",
+                }}
+              >
+                 <div className="w-full h-full bg-cyan-500/20" />
+              </motion.div>
+           )
+        })}
+
+        {/* Central Community Hub */}
+        <motion.div 
+          className="w-20 h-20 rounded-2xl rotate-45 bg-gradient-to-tr from-cyan-600 to-blue-500 flex items-center justify-center z-10 shadow-[0_0_40px_rgba(6,182,212,0.6)]"
+          animate={{ scale: [1, 1.1, 1], rotate: [45, 45, 45] }}
+          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        >
+           <Users className="w-8 h-8 text-white -rotate-45" />
+        </motion.div>
+      </motion.div>
+    </div>
+  );
+}

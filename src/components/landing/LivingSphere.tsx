@@ -21,6 +21,7 @@ const COLOR_FEED = new THREE.Color("#10b981"); // Emerald
 const COLOR_COMMUNITIES = new THREE.Color("#06b6d4");
 const COLOR_AUTH = new THREE.Color("#6366f1");
 const COLOR_CREATOR = new THREE.Color("#fbbf24"); // Amber/Gold
+const COLOR_AI = new THREE.Color("#0ea5e9"); // Cyan
 const COLOR_CTA = new THREE.Color("#FCD34D");
 
 function SphereNodes() {
@@ -205,6 +206,27 @@ function SphereNodes() {
             // Slight uplift
             y += pulse * 0.05;
          }
+      } else if (activeFeature === 'ai') {
+         // Small intelligent clusters reorganize automatically
+         // Nodes group into multiple small centers
+         const clusterCount = 5;
+         const clusterId = i % clusterCount;
+         const angle = (clusterId / clusterCount) * Math.PI * 2;
+         const targetX = Math.cos(angle + time * 0.2) * (SPHERE_RADIUS * 0.8);
+         const targetY = Math.sin(time * 0.5 + clusterId) * 1.5;
+         const targetZ = Math.sin(angle + time * 0.2) * (SPHERE_RADIUS * 0.8);
+         
+         const pull = 0.05;
+         x += (targetX - x) * pull;
+         y += (targetY - y) * pull;
+         z += (targetZ - z) * pull;
+         
+         const glow = Math.sin(time * 3 + phases[i]) * 0.5 + 0.5;
+         // Mix Gold and Cyan
+         const mixed = COLOR_AI.clone().lerp(COLOR_CREATOR, clusterId % 2 === 0 ? 1 : 0);
+         r = THREE.MathUtils.lerp(r, mixed.r, glow);
+         g = THREE.MathUtils.lerp(g, mixed.g, glow);
+         b = THREE.MathUtils.lerp(b, mixed.b, glow);
       } else if (activeFeature === 'cta') {
          // Massive golden pulse
          const pulse = Math.sin(distFromCenter - time * 10) * 0.5 + 0.5;

@@ -7,7 +7,6 @@ import { Loader } from "@/components/landing/Loader";
 import { Hero } from "@/components/landing/Hero";
 import { Features } from "@/components/landing/Features";
 import { Footer } from "@/components/landing/Footer";
-import { CTA } from "@/components/landing/CTA";
 import { SphereProvider } from "@/components/landing/SphereContext";
 
 export default function LandingPage() {
@@ -26,8 +25,6 @@ export default function LandingPage() {
         <main className="relative z-10 flex flex-col">
           <Hero isLoaded={isLoaded} />
           <Features />
-          {/* Keeping CTA and Footer, but they will sit at the bottom naturally */}
-          <CTA />
         </main>
 
         <Footer />
