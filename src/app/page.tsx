@@ -8,27 +8,30 @@ import { Hero } from "@/components/landing/Hero";
 import { Features } from "@/components/landing/Features";
 import { Footer } from "@/components/landing/Footer";
 import { CTA } from "@/components/landing/CTA";
+import { SphereProvider } from "@/components/landing/SphereContext";
 
 export default function LandingPage() {
   const [isLoaded, setIsLoaded] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-[#FAFAFA] overflow-x-hidden font-sans selection:bg-[#F59E0B]/30">
-      {!isLoaded && <Loader onComplete={() => setIsLoaded(true)} />}
-      
-      <Navbar />
-      
-      {/* Background 3D Engine */}
-      <LivingSphere />
-      
-      <main className="relative z-10 flex flex-col">
-        <Hero isLoaded={isLoaded} />
-        <Features />
-        {/* Keeping CTA and Footer, but they will sit at the bottom naturally */}
-        <CTA />
-      </main>
+    <SphereProvider>
+      <div className="min-h-screen bg-[#0A0A0A] text-[#FAFAFA] overflow-x-hidden font-sans selection:bg-[#F59E0B]/30">
+        {!isLoaded && <Loader onComplete={() => setIsLoaded(true)} />}
+        
+        <Navbar />
+        
+        {/* Background 3D Engine */}
+        <LivingSphere />
+        
+        <main className="relative z-10 flex flex-col">
+          <Hero isLoaded={isLoaded} />
+          <Features />
+          {/* Keeping CTA and Footer, but they will sit at the bottom naturally */}
+          <CTA />
+        </main>
 
-      <Footer />
-    </div>
+        <Footer />
+      </div>
+    </SphereProvider>
   );
 }

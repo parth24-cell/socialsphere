@@ -1,11 +1,13 @@
 "use client";
 
-import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import { motion, useScroll, useTransform, AnimatePresence, useInView } from "framer-motion";
 import { MessageSquare, Image as ImageIcon, Users, Shield, Sparkles, PenTool } from "lucide-react";
 import { useRef, useState, useEffect } from "react";
+import { useSphere, ActiveFeature } from "./SphereContext";
 
 const features = [
   {
+    id: "messaging" as ActiveFeature,
     title: "Real-Time Messaging",
     description: "Instant, ultra-low latency connections.",
     icon: MessageSquare,
@@ -16,6 +18,7 @@ const features = [
     iconColor: "#d946ef"
   },
   {
+    id: "stories" as ActiveFeature,
     title: "Stories",
     description: "Share fleeting moments with high fidelity.",
     icon: ImageIcon,
@@ -26,6 +29,7 @@ const features = [
     iconColor: "#60a5fa"
   },
   {
+    id: "communities" as ActiveFeature,
     title: "Communities",
     description: "Find your tribe in specialized groups.",
     icon: Users,
@@ -36,6 +40,7 @@ const features = [
     iconColor: "#22d3ee"
   },
   {
+    id: "auth" as ActiveFeature,
     title: "Secure Authentication",
     description: "Enterprise-grade security, protecting your data.",
     icon: Shield,
@@ -46,6 +51,7 @@ const features = [
     iconColor: "#a78bfa"
   },
   {
+    id: null,
     title: "AI Discovery (Coming Soon)",
     description: "Intelligent curation without the noise.",
     icon: Sparkles,
@@ -56,6 +62,7 @@ const features = [
     iconColor: "#fbbf24"
   },
   {
+    id: null,
     title: "Creator Tools (Coming Soon)",
     description: "Everything you need to build your audience.",
     icon: PenTool,
@@ -110,6 +117,19 @@ function FeatureCard({ feature, scrollYProgress }: { feature: typeof features[0]
   const y = useTransform(scrollYProgress, [0, 1], feature.parallax);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+  
+  const isInView = useInView(cardRef, { margin: "-200px 0px" });
+  const { setActiveFeature, activeFeature } = useSphere();
+
+  useEffect(() => {
+    if (isInView && feature.id) {
+      setActiveFeature(feature.id);
+    } else if (!isInView && activeFeature === feature.id) {
+      // Clear if scrolling past
+      setActiveFeature(null);
+    }
+  }, [isInView, feature.id, setActiveFeature, activeFeature]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -124,6 +144,7 @@ function FeatureCard({ feature, scrollYProgress }: { feature: typeof features[0]
 
   return (
     <motion.div
+      ref={cardRef}
       style={{ y }}
       initial={{ opacity: 0, scale: 0.95, filter: "blur(10px)" }}
       whileInView={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
