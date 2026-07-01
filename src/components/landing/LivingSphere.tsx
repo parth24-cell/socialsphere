@@ -76,10 +76,10 @@ function EngineeredStructure() {
 
   // Premium Physical Material shared by both wireframe and nodes
   const premiumMaterial = useMemo(() => new THREE.MeshPhysicalMaterial({
-    color: "#1e293b", // Slate 800 - visible base
-    emissive: "#020617",
+    color: "#f8fafc", // Slate 50 - Very bright for the nodes
+    emissive: "#334155", // Slight inner glow
     roughness: 0.1, // Glass/Metal finish
-    metalness: 0.9, // Highly reflective
+    metalness: 0.8, // Highly reflective
     clearcoat: 1.0,
     clearcoatRoughness: 0.1,
     transparent: true,
@@ -87,12 +87,12 @@ function EngineeredStructure() {
   }), []);
 
   const wireframeMaterial = useMemo(() => new THREE.MeshPhysicalMaterial({
-    color: "#334155", // Slate 700
+    color: "#94a3b8", // Slate 400 - Light gray for the wireframe
     roughness: 0.2,
-    metalness: 1.0,
+    metalness: 0.8,
     wireframe: true,
     transparent: true,
-    opacity: 0.4, // More visible lines
+    opacity: 0.6, // Highly visible lines
   }), []);
 
   // Light targets for dampening
@@ -233,7 +233,7 @@ function EngineeredStructure() {
   return (
     <group ref={groupRef}>
       {/* --- Lighting Rig --- */}
-      <ambientLight ref={ambientRef} intensity={0.4} color="#1e293b" />
+      <ambientLight ref={ambientRef} intensity={0.6} color="#ffffff" />
       
       {/* Core internal light */}
       <pointLight ref={coreLightRef} position={[0, 0, 0]} distance={8} decay={2} />
