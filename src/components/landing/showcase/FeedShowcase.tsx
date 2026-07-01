@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useMotionValue, useTransform, AnimatePresence } from "framer-motion";
+import { motion, useMotionValue, useTransform, AnimatePresence, useMotionTemplate } from "framer-motion";
 import { Heart, MessageCircle, Bookmark, Share2, MoreHorizontal } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -35,25 +35,36 @@ export function FeedShowcase() {
   const [posts, setPosts] = useState(POSTS);
   const [scrollProgress, setScrollProgress] = useState(0);
 
-  // Parallax Setup
+  // Parallax & Spotlight Setup
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
+  const spotlightX = useMotionValue(0);
+  const spotlightY = useMotionValue(0);
 
   const rotateX = useTransform(mouseY, [-500, 500], [4, -4]);
   const rotateY = useTransform(mouseX, [-500, 500], [-4, 4]);
 
   const handleMouseMove = (e: React.MouseEvent) => {
     const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left - rect.width / 2;
-    const y = e.clientY - rect.top - rect.height / 2;
-    mouseX.set(x);
-    mouseY.set(y);
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    // For Rotation (centered)
+    mouseX.set(x - rect.width / 2);
+    mouseY.set(y - rect.height / 2);
+    
+    // For Spotlight (absolute)
+    spotlightX.set(x);
+    spotlightY.set(y);
   };
 
   const handleMouseLeave = () => {
     mouseX.set(0);
     mouseY.set(0);
+    spotlightX.set(0);
   };
+
+  const spotlightBackground = useMotionTemplate`radial-gradient(400px circle at ${spotlightX}px ${spotlightY}px, rgba(16,185,129,0.15), transparent 80%)`;
 
   // Auto-scroll and interaction loop
   useEffect(() => {
@@ -94,13 +105,13 @@ export function FeedShowcase() {
 
   return (
     <div 
-      className="relative w-full max-w-lg aspect-[4/5] flex items-center justify-center [perspective:1000px] mx-auto"
+      className="relative w-full max-w-lg aspect-[4/5] flex items-center justify-center [perspective:1000px] mx-auto group"
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
       {/* Ambient Glow */}
       <motion.div 
-         className="absolute inset-0 bg-[#10b981]/10 blur-[120px] rounded-full"
+         className="absolute inset-0 bg-[#10b981]/10 blur-[120px] rounded-full group-hover:bg-[#10b981]/20 transition-colors duration-500"
          animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.4, 0.2] }}
          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
       />
@@ -110,6 +121,7 @@ export function FeedShowcase() {
         style={{ rotateX, rotateY }}
         className="w-full h-full bg-[#020205]/40 backdrop-blur-2xl border border-white/5 border-t-white/10 border-l-white/10 rounded-[2.5rem] shadow-[0_0_50px_-12px_rgba(0,0,0,0.8)] overflow-hidden relative z-10 flex flex-col"
       >
+        <motion.div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-30" style={{ background: spotlightBackground }} />
         <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
 
         {/* Top Navbar */}
@@ -171,23 +183,37 @@ export function FeedShowcase() {
 
                     {/* Actions */}
                     <div className="flex gap-6 pt-2">
-                       <motion.div className="flex gap-2 items-center text-white/50 cursor-pointer" animate={post.isLiked ? { color: "#ef4444" } : {}}>
+                       <motion.div 
+                          className="flex gap-2 items-center text-white/50 cursor-pointer hover:text-white transition-colors" 
+                          whileTap={{ scale: 0.95 }}
+                          animate={post.isLiked ? { color: "#ef4444" } : {}}
+                       >
                           <motion.div animate={post.isLiked ? { scale: [1, 1.4, 1] } : {}} transition={{ type: "spring", stiffness: 400, damping: 10 }}>
                              <Heart className="w-5 h-5" fill={post.isLiked ? "#ef4444" : "transparent"} color={post.isLiked ? "#ef4444" : "currentColor"} />
                           </motion.div>
                           <span className="text-sm font-medium">{post.likes}</span>
                        </motion.div>
                        
-                       <div className="flex gap-2 items-center text-white/50 cursor-pointer">
+                       <motion.div 
+                          className="flex gap-2 items-center text-white/50 cursor-pointer hover:text-white transition-colors"
+                          whileTap={{ scale: 0.95 }}
+                       >
                           <MessageCircle className="w-5 h-5" />
                           <span className="text-sm font-medium">{post.comments}</span>
-                       </div>
+                       </motion.div>
 
-                       <div className="flex gap-2 items-center text-white/50 cursor-pointer">
+                       <motion.div 
+                          className="flex gap-2 items-center text-white/50 cursor-pointer hover:text-white transition-colors"
+                          whileTap={{ scale: 0.95 }}
+                       >
                           <Share2 className="w-5 h-5" />
-                       </div>
+                       </motion.div>
 
-                       <motion.div className="ml-auto text-white/50 cursor-pointer" animate={post.isBookmarked ? { color: "#3b82f6" } : {}}>
+                       <motion.div 
+                          className="ml-auto text-white/50 cursor-pointer hover:text-white transition-colors" 
+                          whileTap={{ scale: 0.95 }}
+                          animate={post.isBookmarked ? { color: "#3b82f6" } : {}}
+                       >
                           <motion.div animate={post.isBookmarked ? { scale: [1, 1.3, 1] } : {}} transition={{ type: "spring" }}>
                              <Bookmark className="w-5 h-5" fill={post.isBookmarked ? "#3b82f6" : "transparent"} color={post.isBookmarked ? "#3b82f6" : "currentColor"} />
                           </motion.div>

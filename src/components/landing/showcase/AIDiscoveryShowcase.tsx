@@ -1,38 +1,49 @@
 "use client";
 
-import { motion, useMotionValue, useTransform } from "framer-motion";
+import { motion, useMotionValue, useTransform, useMotionTemplate } from "framer-motion";
 import { Sparkles, Hash, UserPlus, ShieldPlus } from "lucide-react";
 
 export function AIDiscoveryShowcase() {
-  // Parallax Setup
+  // Parallax & Spotlight Setup
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
+  const spotlightX = useMotionValue(0);
+  const spotlightY = useMotionValue(0);
 
   const rotateX = useTransform(mouseY, [-500, 500], [5, -5]);
   const rotateY = useTransform(mouseX, [-500, 500], [-5, 5]);
 
   const handleMouseMove = (e: React.MouseEvent) => {
     const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left - rect.width / 2;
-    const y = e.clientY - rect.top - rect.height / 2;
-    mouseX.set(x);
-    mouseY.set(y);
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    // For Rotation (centered)
+    mouseX.set(x - rect.width / 2);
+    mouseY.set(y - rect.height / 2);
+    
+    // For Spotlight (absolute)
+    spotlightX.set(x);
+    spotlightY.set(y);
   };
 
   const handleMouseLeave = () => {
     mouseX.set(0);
     mouseY.set(0);
+    spotlightX.set(0);
   };
+
+  const spotlightBackground = useMotionTemplate`radial-gradient(400px circle at ${spotlightX}px ${spotlightY}px, rgba(255,255,255,0.15), transparent 80%)`;
 
   return (
     <div 
-      className="relative w-full max-w-lg aspect-video flex items-center justify-center [perspective:1000px] mx-auto"
+      className="relative w-full max-w-lg aspect-video flex items-center justify-center [perspective:1000px] mx-auto group"
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
       {/* Ambient Glow */}
       <motion.div 
-         className="absolute inset-0 bg-white/5 blur-[120px] rounded-full"
+         className="absolute inset-0 bg-white/5 blur-[120px] rounded-full group-hover:bg-white/10 transition-colors duration-500"
          animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
       />
@@ -42,7 +53,8 @@ export function AIDiscoveryShowcase() {
         style={{ rotateX, rotateY }}
         className="w-full h-full bg-[#020205]/40 backdrop-blur-2xl border border-white/5 border-t-white/10 border-l-white/10 rounded-[2.5rem] p-6 shadow-[0_0_50px_-12px_rgba(0,0,0,0.8)] overflow-hidden relative z-10 flex flex-col gap-6"
       >
-        <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
+        <motion.div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-30" style={{ background: spotlightBackground }} />
+        <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none transition-opacity duration-500 group-hover:opacity-0" />
 
         {/* Coming Soon Badge */}
         <div className="absolute top-6 right-6 px-3 py-1.5 rounded-full bg-gradient-to-r from-cyan-500/20 to-amber-500/20 border border-white/10 flex items-center gap-1.5 shadow-[0_0_15px_rgba(6,182,212,0.2)]">

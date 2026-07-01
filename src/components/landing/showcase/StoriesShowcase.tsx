@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useMotionValue, useTransform, AnimatePresence } from "framer-motion";
+import { motion, useMotionValue, useTransform, AnimatePresence, useMotionTemplate } from "framer-motion";
 import { useEffect, useState } from "react";
 import { Heart, Send, MoreHorizontal, X } from "lucide-react";
 
@@ -14,25 +14,36 @@ export function StoriesShowcase() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [progress, setProgress] = useState(0);
 
-  // Parallax Setup
+  // Parallax & Spotlight Setup
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
+  const spotlightX = useMotionValue(0);
+  const spotlightY = useMotionValue(0);
 
   const rotateX = useTransform(mouseY, [-500, 500], [5, -5]);
   const rotateY = useTransform(mouseX, [-500, 500], [-5, 5]);
 
   const handleMouseMove = (e: React.MouseEvent) => {
     const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left - rect.width / 2;
-    const y = e.clientY - rect.top - rect.height / 2;
-    mouseX.set(x);
-    mouseY.set(y);
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    // For Rotation (centered)
+    mouseX.set(x - rect.width / 2);
+    mouseY.set(y - rect.height / 2);
+    
+    // For Spotlight (absolute)
+    spotlightX.set(x);
+    spotlightY.set(y);
   };
 
   const handleMouseLeave = () => {
     mouseX.set(0);
     mouseY.set(0);
+    spotlightX.set(0);
   };
+
+  const spotlightBackground = useMotionTemplate`radial-gradient(400px circle at ${spotlightX}px ${spotlightY}px, rgba(59,130,246,0.15), transparent 80%)`;
 
   // Story Loop Logic
   useEffect(() => {
@@ -51,13 +62,13 @@ export function StoriesShowcase() {
 
   return (
     <div 
-      className="relative w-full max-w-sm aspect-[9/16] flex items-center justify-center [perspective:1000px] mx-auto"
+      className="relative w-full max-w-sm aspect-[9/16] flex items-center justify-center [perspective:1000px] mx-auto group"
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
       {/* Ambient Glow */}
       <motion.div 
-         className="absolute inset-0 bg-[#3b82f6]/10 blur-[120px] rounded-full"
+         className="absolute inset-0 bg-[#3b82f6]/10 blur-[120px] rounded-full group-hover:bg-[#3b82f6]/20 transition-colors duration-500"
          animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.5, 0.2] }}
          transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
       />
@@ -67,6 +78,7 @@ export function StoriesShowcase() {
         style={{ rotateX, rotateY }}
         className="w-full h-full bg-[#020205]/40 backdrop-blur-2xl border border-white/5 border-t-white/10 border-l-white/10 rounded-[2.5rem] shadow-[0_0_50px_-12px_rgba(0,0,0,0.8)] overflow-hidden relative z-10 flex flex-col"
       >
+         <motion.div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-30" style={{ background: spotlightBackground }} />
          <AnimatePresence initial={false}>
             <motion.div 
                key={currentIndex}
