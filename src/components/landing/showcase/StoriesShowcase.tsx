@@ -1,9 +1,19 @@
 "use client";
 
-import { motion, useMotionValue, useTransform } from "framer-motion";
-import { Heart } from "lucide-react";
+import { motion, useMotionValue, useTransform, AnimatePresence } from "framer-motion";
+import { useEffect, useState } from "react";
+import { Heart, Send, MoreHorizontal, X } from "lucide-react";
+
+const STORIES = [
+  { id: 1, img: "linear-gradient(to bottom right, #3b82f6, #8b5cf6)", user: "Alex Chen", time: "2h" },
+  { id: 2, img: "linear-gradient(to bottom right, #f43f5e, #f97316)", user: "Alex Chen", time: "2h" },
+  { id: 3, img: "linear-gradient(to bottom right, #10b981, #3b82f6)", user: "Alex Chen", time: "2h" }
+];
 
 export function StoriesShowcase() {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [progress, setProgress] = useState(0);
+
   // Parallax Setup
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -24,6 +34,21 @@ export function StoriesShowcase() {
     mouseY.set(0);
   };
 
+  // Story Loop Logic
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setProgress(p => {
+        if (p >= 100) {
+           setCurrentIndex(c => (c + 1) % STORIES.length);
+           return 0;
+        }
+        return p + 1; // 100 steps over 3 seconds = 30ms interval
+      });
+    }, 30);
+    
+    return () => clearInterval(timer);
+  }, []);
+
   return (
     <div 
       className="relative w-full max-w-sm aspect-[9/16] flex items-center justify-center [perspective:1000px] mx-auto"
@@ -32,78 +57,82 @@ export function StoriesShowcase() {
     >
       {/* Ambient Glow */}
       <motion.div 
-         className="absolute inset-0 bg-blue-500/20 blur-[80px] rounded-full"
-         animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.5, 0.3] }}
-         transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+         className="absolute inset-0 bg-blue-500/20 blur-[100px] rounded-full"
+         animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.5, 0.2] }}
+         transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
       />
       
-      {/* Parallax Container */}
+      {/* Phone Frame */}
       <motion.div 
         style={{ rotateX, rotateY }}
-        className="w-full h-full bg-black/40 backdrop-blur-2xl border border-white/10 rounded-[3rem] p-6 shadow-2xl relative overflow-hidden z-10 flex flex-col"
+        className="w-full h-full bg-black border border-white/10 rounded-[2.5rem] shadow-2xl overflow-hidden relative z-10 flex flex-col"
       >
-        {/* Animated Gradient Background */}
-        <motion.div 
-           className="absolute inset-0 bg-gradient-to-b from-blue-600/30 via-transparent to-transparent opacity-50"
-           animate={{ scale: [1, 1.2, 1] }}
-           transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-        />
+         <AnimatePresence initial={false}>
+            <motion.div 
+               key={currentIndex}
+               initial={{ opacity: 0, scale: 1.1 }}
+               animate={{ opacity: 1, scale: 1 }}
+               exit={{ opacity: 0, scale: 0.9 }}
+               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+               className="absolute inset-0 z-0"
+               style={{ background: STORIES[currentIndex].img }}
+            />
+         </AnimatePresence>
+         
+         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/80 z-10 pointer-events-none" />
 
-        {/* Progress Bars */}
-        <div className="flex gap-2 mb-6 relative z-10">
-          <motion.div className="h-1 bg-white/20 rounded-full flex-1 overflow-hidden">
-             <motion.div 
-                className="h-full bg-white shadow-[0_0_10px_white]" 
-                animate={{ width: ["0%", "100%"] }} 
-                transition={{ duration: 6, repeat: Infinity, ease: "linear" }} 
-             />
-          </motion.div>
-          <div className="h-1 bg-white/20 rounded-full flex-1" />
-          <div className="h-1 bg-white/20 rounded-full flex-1" />
-        </div>
+         {/* Top Bar */}
+         <div className="p-4 relative z-20 flex flex-col gap-3">
+            {/* Progress Bars */}
+            <div className="flex gap-1.5 w-full">
+               {STORIES.map((_, i) => (
+                  <div key={i} className="h-1 flex-1 bg-white/30 rounded-full overflow-hidden">
+                     <div 
+                        className="h-full bg-white transition-all duration-75"
+                        style={{ 
+                           width: i === currentIndex ? `${progress}%` : i < currentIndex ? '100%' : '0%' 
+                        }}
+                     />
+                  </div>
+               ))}
+            </div>
 
-        {/* Header */}
-        <div className="flex items-center gap-3 relative z-10">
-          <div className="relative">
-            <svg className="w-10 h-10 -rotate-90">
-               <circle cx="20" cy="20" r="18" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="2" />
-               <motion.circle 
-                  cx="20" cy="20" r="18" fill="none" stroke="#3b82f6" strokeWidth="2" strokeDasharray="113"
-                  animate={{ strokeDashoffset: [113, 0] }}
-                  transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
-               />
-            </svg>
-            <div className="absolute inset-0 m-1 bg-gradient-to-tr from-blue-400 to-cyan-400 rounded-full" />
-          </div>
-          <div>
-            <div className="text-white font-medium text-sm drop-shadow-md">Alex Chen</div>
-            <div className="text-white/60 text-xs drop-shadow-md">2h ago</div>
-          </div>
-        </div>
+            {/* User Info */}
+            <div className="flex items-center justify-between">
+               <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-black/20 backdrop-blur-md p-[2px] border border-white/40 shadow-[0_0_15px_rgba(255,255,255,0.3)]">
+                     <div className="w-full h-full bg-white/20 rounded-full" />
+                  </div>
+                  <span className="text-white font-medium text-sm drop-shadow-md">{STORIES[currentIndex].user}</span>
+                  <span className="text-white/60 text-xs drop-shadow-md">{STORIES[currentIndex].time}</span>
+               </div>
+               <div className="flex items-center gap-3 text-white">
+                  <MoreHorizontal className="w-5 h-5 drop-shadow-md" />
+                  <X className="w-6 h-6 drop-shadow-md" />
+               </div>
+            </div>
+         </div>
 
-        {/* Story Content Placeholder */}
-        <div className="flex-1 my-4 rounded-2xl bg-gradient-to-tr from-white/5 to-white/10 border border-white/5 relative overflow-hidden">
-           {/* Glare effect */}
-           <motion.div 
-             className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent w-[200%] h-[200%] -translate-x-1/2 -translate-y-1/2"
-             animate={{ rotate: [0, 45, 0] }}
-             transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-           />
-        </div>
-
-        {/* Footer Actions */}
-        <div className="flex items-center gap-4 relative z-10">
-           <div className="flex-1 h-12 rounded-full border border-white/20 bg-black/20 flex items-center px-4 text-white/50 text-sm backdrop-blur-md">
-              Send message...
-           </div>
-           <motion.div 
-             className="w-12 h-12 rounded-full bg-white/10 border border-white/10 flex items-center justify-center backdrop-blur-md text-white/80"
-             whileHover={{ scale: 1.1, backgroundColor: "rgba(239, 68, 68, 0.2)", color: "#ef4444", borderColor: "rgba(239, 68, 68, 0.5)" }}
-             whileTap={{ scale: 0.9 }}
-           >
-              <Heart className="w-6 h-6" />
-           </motion.div>
-        </div>
+         <div className="mt-auto p-4 relative z-20">
+            {/* Input & Actions */}
+            <div className="flex items-center gap-3">
+               <div className="flex-1 h-12 rounded-full border border-white/30 backdrop-blur-md bg-black/20 px-4 flex items-center">
+                  <span className="text-white/60 text-sm">Send message</span>
+               </div>
+               <motion.div 
+                 className="w-12 h-12 rounded-full flex items-center justify-center cursor-pointer hover:bg-white/10 transition-colors"
+                 whileTap={{ scale: 0.9 }}
+               >
+                  <Heart className="w-7 h-7 text-white drop-shadow-md" />
+               </motion.div>
+               <motion.div 
+                 className="w-12 h-12 rounded-full flex items-center justify-center cursor-pointer hover:bg-white/10 transition-colors"
+                 whileTap={{ scale: 0.9 }}
+               >
+                  <Send className="w-6 h-6 text-white drop-shadow-md -rotate-45 mb-1" />
+               </motion.div>
+            </div>
+         </div>
       </motion.div>
     </div>
   );

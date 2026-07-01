@@ -28,9 +28,11 @@ export function CreatorToolsShowcase() {
   };
 
   useEffect(() => {
+     let current = 12402;
      const t = setInterval(() => {
-        setTicker(prev => prev + Math.floor(Math.random() * 5) + 1);
-     }, 3000);
+        current += Math.floor(Math.random() * 3) + 1;
+        setTicker(current);
+     }, 1500);
      return () => clearInterval(t);
   }, []);
 
@@ -108,11 +110,10 @@ export function CreatorToolsShowcase() {
            {[30, 45, 35, 60, 40, 75, 55, 90, 85].map((h, i) => (
               <motion.div 
                 key={i} 
-                className="w-full bg-amber-500/80 rounded-t-sm relative z-10 hover:bg-amber-400 transition-colors cursor-pointer"
+                className="w-full bg-amber-500/80 rounded-t-sm relative z-10 hover:bg-amber-400 transition-colors cursor-pointer origin-bottom"
                 initial={{ height: 0 }}
-                whileInView={{ height: `${h}%` }}
-                transition={{ duration: 1, delay: i * 0.05, type: "spring", stiffness: 100 }}
-                viewport={{ once: true }}
+                animate={{ height: [`${h}%`, `${h + (Math.random() * 10 - 5)}%`, `${h}%`] }}
+                transition={{ duration: 4, delay: i * 0.1, repeat: Infinity, ease: "easeInOut" }}
               />
            ))}
         </div>
