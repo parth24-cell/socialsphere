@@ -118,7 +118,7 @@ function FeatureCard({ feature, scrollYProgress }: { feature: typeof features[0]
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
-  
+
   const isInView = useInView(cardRef, { margin: "-200px 0px" });
   const { setActiveFeature, activeFeature } = useSphere();
 
@@ -171,7 +171,7 @@ function FeatureCard({ feature, scrollYProgress }: { feature: typeof features[0]
         }}
       >
         {/* Soft animated border */}
-        <motion.div 
+        <motion.div
           className="absolute inset-0 rounded-[2rem] border border-white/[0.08] pointer-events-none"
           animate={{
             boxShadow: isHovered ? activeBorderGlow : idleBorderGlow,
@@ -196,11 +196,11 @@ function FeatureCard({ feature, scrollYProgress }: { feature: typeof features[0]
         )}
 
         {/* Ambient colored glow */}
-        <motion.div 
+        <motion.div
           className="absolute inset-0 pointer-events-none"
           animate={{
             opacity: isHovered ? 0.6 : 0.2,
-            background: isHovered 
+            background: isHovered
               ? `radial-gradient(circle at 50% 0%, ${feature.glow} 0%, transparent 80%)`
               : `radial-gradient(circle at 50% 0%, ${feature.glow} 0%, transparent 60%)`
           }}
@@ -239,22 +239,22 @@ function FeatureCard({ feature, scrollYProgress }: { feature: typeof features[0]
 
         {/* Content */}
         <div className="relative z-10 flex flex-col h-full justify-between p-8 pointer-events-none">
-          <motion.div 
+          <motion.div
             className="h-12 w-12 rounded-full bg-[#111216]/90 flex items-center justify-center mb-8 border shadow-inner transition-all duration-350 ease-out backdrop-blur-md"
             animate={{
               scale: isHovered ? 1.1 : 1,
               borderColor: isHovered ? feature.borderGlow : "rgba(255,255,255,0.1)",
-              boxShadow: isHovered 
-                ? `0 0 20px ${feature.glow}, inset 0 2px 5px rgba(0,0,0,0.8)` 
+              boxShadow: isHovered
+                ? `0 0 20px ${feature.glow}, inset 0 2px 5px rgba(0,0,0,0.8)`
                 : `0 0 0px transparent, inset 0 2px 5px rgba(0,0,0,0.5)`
             }}
           >
-            <feature.icon 
-              className="h-5 w-5 transition-all duration-350" 
-              style={{ 
+            <feature.icon
+              className="h-5 w-5 transition-all duration-350"
+              style={{
                 color: feature.iconColor,
-                filter: isHovered ? `drop-shadow(0 0 12px ${feature.iconColor})` : `drop-shadow(0 0 4px ${feature.iconColor})` 
-              }} 
+                filter: isHovered ? `drop-shadow(0 0 12px ${feature.iconColor})` : `drop-shadow(0 0 4px ${feature.iconColor})`
+              }}
             />
           </motion.div>
           <div>
