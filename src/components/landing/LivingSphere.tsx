@@ -6,7 +6,7 @@ import * as THREE from "three";
 import { useScroll } from "framer-motion";
 import { useSphere } from "./SphereContext";
 
-const SPHERE_RADIUS = 3.5;
+const SPHERE_RADIUS = 2.5; // Made smaller
 const damp = THREE.MathUtils.damp;
 
 // Premium Lighting Rig Colors
@@ -76,8 +76,8 @@ function EngineeredStructure() {
 
   // Premium Physical Material shared by both wireframe and nodes
   const premiumMaterial = useMemo(() => new THREE.MeshPhysicalMaterial({
-    color: "#f8fafc", // Slate 50 - Very bright for the nodes
-    emissive: "#334155", // Slight inner glow
+    color: "#fef3c7", // Amber 50 - Bright warm node color
+    emissive: "#b45309", // Amber 700 - Warm orangish inner glow
     roughness: 0.1, // Glass/Metal finish
     metalness: 0.8, // Highly reflective
     clearcoat: 1.0,
@@ -87,12 +87,12 @@ function EngineeredStructure() {
   }), []);
 
   const wireframeMaterial = useMemo(() => new THREE.MeshPhysicalMaterial({
-    color: "#94a3b8", // Slate 400 - Light gray for the wireframe
+    color: "#f59e0b", // Amber 500 - Solid orangish wireframe
     roughness: 0.2,
     metalness: 0.8,
     wireframe: true,
     transparent: true,
-    opacity: 0.6, // Highly visible lines
+    opacity: 0.85, // Highly visible lines
   }), []);
 
   // Light targets for dampening
@@ -233,7 +233,7 @@ function EngineeredStructure() {
   return (
     <group ref={groupRef}>
       {/* --- Lighting Rig --- */}
-      <ambientLight ref={ambientRef} intensity={0.6} color="#ffffff" />
+      <ambientLight ref={ambientRef} intensity={1.2} color="#fffbeb" />
       
       {/* Core internal light */}
       <pointLight ref={coreLightRef} position={[0, 0, 0]} distance={8} decay={2} />
