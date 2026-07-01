@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, ReactNode } from "react";
 
-export type ActiveFeature = "messaging" | "stories" | "communities" | "auth" | "cta" | null;
+export type ActiveFeature = "messaging" | "stories" | "feed" | "communities" | "auth" | "creator" | "cta" | null;
 
 interface SphereContextType {
   activeFeature: ActiveFeature;

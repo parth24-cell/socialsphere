@@ -17,8 +17,10 @@ const COLOR_IDLE_HIGH = new THREE.Color("#FDE68A");
 
 const COLOR_MESSAGING = new THREE.Color("#d946ef");
 const COLOR_STORIES = new THREE.Color("#3b82f6");
+const COLOR_FEED = new THREE.Color("#10b981"); // Emerald
 const COLOR_COMMUNITIES = new THREE.Color("#06b6d4");
 const COLOR_AUTH = new THREE.Color("#6366f1");
+const COLOR_CREATOR = new THREE.Color("#fbbf24"); // Amber/Gold
 const COLOR_CTA = new THREE.Color("#FCD34D");
 
 function SphereNodes() {
@@ -149,6 +151,17 @@ function SphereNodes() {
             x += Math.cos(time * 2 + phases[i]) * 0.05;
             z += Math.sin(time * 2 + phases[i]) * 0.05;
          }
+      } else if (activeFeature === 'feed') {
+         // Random nodes light up rapidly
+         const isGlowing = Math.sin(time * 5 + phases[i] * 10) > 0.9;
+         if (isGlowing) {
+            r = COLOR_FEED.r;
+            g = COLOR_FEED.g;
+            b = COLOR_FEED.b;
+            x += (Math.random() - 0.5) * 0.1;
+            y += (Math.random() - 0.5) * 0.1;
+            z += (Math.random() - 0.5) * 0.1;
+         }
       } else if (activeFeature === 'communities') {
          // Cyan color for new nodes, slight pulse for others
          if (i >= BASE_PARTICLE_COUNT) {
@@ -182,6 +195,16 @@ function SphereNodes() {
          x += (origX - x) * 0.1;
          y += (origY - y) * 0.1;
          z += (origZ - z) * 0.1;
+      } else if (activeFeature === 'creator') {
+         // Golden intelligence pulse from center
+         const pulse = Math.sin(distFromCenter * 2 - time * 5) * 0.5 + 0.5;
+         if (pulse > 0.6) {
+            r = THREE.MathUtils.lerp(r, COLOR_CREATOR.r, pulse);
+            g = THREE.MathUtils.lerp(g, COLOR_CREATOR.g, pulse);
+            b = THREE.MathUtils.lerp(b, COLOR_CREATOR.b, pulse);
+            // Slight uplift
+            y += pulse * 0.05;
+         }
       } else if (activeFeature === 'cta') {
          // Massive golden pulse
          const pulse = Math.sin(distFromCenter - time * 10) * 0.5 + 0.5;
