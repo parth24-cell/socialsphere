@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useEffect } from "react";
-import { motion, useInView } from "framer-motion";
+import { motion, useInView, useScroll, useSpring, useTransform, useVelocity } from "framer-motion";
 import { useSphere, ActiveFeature } from "../SphereContext";
 
 export function ShowcaseContainer({
@@ -21,6 +21,26 @@ export function ShowcaseContainer({
   const isInView = useInView(containerRef, { margin: "-40% 0px -40% 0px" });
   const { setActiveFeature } = useSphere();
 
+  // Scroll architecture hooks
+  const { scrollYProgress, scrollY } = useScroll({
+    target: containerRef,
+    offset: ["start end", "end start"]
+  });
+
+  // Parallax for mockup (moves slightly opposite to scroll to float)
+  const yParallax = useTransform(scrollYProgress, [0, 1], [50, -50]);
+  const smoothY = useSpring(yParallax, { stiffness: 50, damping: 20 });
+
+  // Scroll velocity for typography skewing (Apple/Stripe effect)
+  const scrollVelocity = useVelocity(scrollY);
+  const smoothVelocity = useSpring(scrollVelocity, {
+    damping: 50,
+    stiffness: 400
+  });
+  
+  // Transform velocity to a subtle skew value (-3deg to 3deg max)
+  const skewVelocity = useTransform(smoothVelocity, [-1000, 1000], [-2, 2]);
+
   useEffect(() => {
     if (isInView) {
       setActiveFeature(featureId);
@@ -36,17 +56,21 @@ export function ShowcaseContainer({
       <div className="container mx-auto px-6 md:px-12 lg:px-24 flex flex-col md:flex-row items-center justify-between gap-16 md:gap-24">
          
          {align === "left" && (
-           <div className="flex-1 w-full flex justify-center md:justify-start">
+           <motion.div 
+              style={{ y: smoothY }}
+              className="flex-1 w-full flex justify-center md:justify-start perspective-1000"
+           >
              {children}
-           </div>
+           </motion.div>
          )}
 
          <motion.div 
+           style={{ skewY: skewVelocity }}
            initial={{ opacity: 0, y: 30 }}
            whileInView={{ opacity: 1, y: 0 }}
            transition={{ duration: 0.8, ease: "easeOut" }}
            viewport={{ margin: "-20%" }}
-           className={`flex-1 flex flex-col ${align === "left" ? "md:items-start" : "md:items-end md:text-right"}`}
+           className={`flex-1 flex flex-col origin-center ${align === "left" ? "md:items-start" : "md:items-end md:text-right"}`}
          >
            <h2 className="text-4xl md:text-6xl lg:text-7xl font-semibold text-white tracking-tight mb-6 drop-shadow-xl leading-tight">
              {title}
@@ -57,9 +81,12 @@ export function ShowcaseContainer({
          </motion.div>
 
          {align === "right" && (
-           <div className="flex-1 w-full flex justify-center md:justify-end">
+           <motion.div 
+              style={{ y: smoothY }}
+              className="flex-1 w-full flex justify-center md:justify-end perspective-1000"
+           >
              {children}
-           </div>
+           </motion.div>
          )}
       </div>
     </div>
