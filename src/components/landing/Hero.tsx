@@ -43,11 +43,14 @@ export function Hero({ isLoaded }: { isLoaded: boolean }) {
           initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
           animate={isLoaded ? { opacity: 1, y: 0, filter: "blur(0px)" } : {}}
           transition={{ duration: 1.5, delay: baseDelay, ease: [0.16, 1, 0.3, 1] }}
-          className="space-y-6 max-w-4xl"
+          className="space-y-6 max-w-4xl relative"
         >
+          {/* Ambient Occlusion Mask for Hero Text Readability */}
+          <div className="absolute inset-0 pointer-events-none -z-10 bg-[radial-gradient(ellipse_at_center,rgba(2,2,5,0.6)_0%,transparent_70%)] scale-150 origin-center" />
+          
           {/* Floating Letters */}
           <motion.h1 
-            className="text-5xl md:text-7xl lg:text-8xl font-medium tracking-tight text-[#FAFAFA] leading-[1.1]"
+            className="text-5xl md:text-7xl lg:text-8xl font-medium tracking-tight text-[#FAFAFA] leading-[1.1] drop-shadow-2xl"
             animate={{ y: [0, -10, 0] }}
             transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
           >
@@ -62,7 +65,7 @@ export function Hero({ isLoaded }: { isLoaded: boolean }) {
           initial={{ opacity: 0 }}
           animate={isLoaded ? { opacity: 1 } : {}}
           transition={{ duration: 1.5, delay: baseDelay + 0.5, ease: "easeOut" }}
-          className="mt-8 text-lg md:text-xl text-[#A1A1AA] max-w-2xl font-light"
+          className="mt-8 text-lg md:text-xl text-[#A1A1AA] max-w-2xl font-light drop-shadow-md relative z-10"
         >
           Build authentic relationships through conversations, stories, and communities—all in a beautifully designed, real-time experience.
         </motion.p>

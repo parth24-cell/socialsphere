@@ -33,7 +33,7 @@ export function Navbar() {
         <div className="hidden md:flex items-center justify-center absolute inset-0 pointer-events-none">
           <nav 
             className={`pointer-events-auto flex items-center gap-1 rounded-full px-4 py-2 transition-all duration-500 ${
-              isScrolled ? "bg-[#111216]/80 backdrop-blur-md border border-white/5 shadow-lg" : ""
+              isScrolled ? "bg-[#020205]/60 backdrop-blur-2xl border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.5)]" : ""
             }`}
           >
             {[

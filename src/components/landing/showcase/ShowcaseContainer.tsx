@@ -70,12 +70,15 @@ export function ShowcaseContainer({
            whileInView={{ opacity: 1, y: 0 }}
            transition={{ duration: 0.8, ease: "easeOut" }}
            viewport={{ margin: "-20%" }}
-           className={`flex-1 flex flex-col origin-center ${align === "left" ? "md:items-start" : "md:items-end md:text-right"}`}
+           className={`flex-1 flex flex-col origin-center relative ${align === "left" ? "md:items-start" : "md:items-end md:text-right"}`}
          >
-           <h2 className="text-4xl md:text-6xl lg:text-7xl font-semibold text-white tracking-tight mb-6 drop-shadow-xl leading-tight">
+           {/* Ambient Occlusion Mask for Text Readability */}
+           <div className={`absolute inset-0 pointer-events-none -z-10 bg-[radial-gradient(ellipse_at_center,rgba(2,2,5,0.6)_0%,transparent_70%)] scale-150 ${align === "left" ? "origin-left" : "origin-right"}`} />
+
+           <h2 className="text-4xl md:text-6xl lg:text-7xl font-semibold text-white tracking-tight mb-6 drop-shadow-2xl leading-tight">
              {title}
            </h2>
-           <p className="text-xl md:text-2xl text-white/60 font-light leading-relaxed max-w-lg">
+           <p className="text-xl md:text-2xl text-white/70 font-light leading-relaxed max-w-lg drop-shadow-md">
              {description}
            </p>
          </motion.div>
