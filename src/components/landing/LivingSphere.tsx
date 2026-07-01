@@ -76,8 +76,8 @@ function EngineeredStructure() {
 
   // Premium Physical Material shared by both wireframe and nodes
   const premiumMaterial = useMemo(() => new THREE.MeshPhysicalMaterial({
-    color: "#020617", // Very dark base
-    emissive: "#000000",
+    color: "#1e293b", // Slate 800 - visible base
+    emissive: "#020617",
     roughness: 0.1, // Glass/Metal finish
     metalness: 0.9, // Highly reflective
     clearcoat: 1.0,
@@ -87,12 +87,12 @@ function EngineeredStructure() {
   }), []);
 
   const wireframeMaterial = useMemo(() => new THREE.MeshPhysicalMaterial({
-    color: "#0f172a",
+    color: "#334155", // Slate 700
     roughness: 0.2,
     metalness: 1.0,
     wireframe: true,
     transparent: true,
-    opacity: 0.15, // Extremely subtle lines
+    opacity: 0.4, // More visible lines
   }), []);
 
   // Light targets for dampening
@@ -193,6 +193,18 @@ function EngineeredStructure() {
             orbitalLightRef.current.position.set(4, 4, 4);
         }
     }
+    else {
+        // Default Majestic Idle State (Top of page)
+        targetCoreColor.copy(L_BASE);
+        coreIntensity = 1; // Soft internal glow
+        targetOrbitalColor.copy(new THREE.Color("#ffffff"));
+        orbitalIntensity = 3; // Gentle moving highlight
+        if (orbitalLightRef.current) {
+            orbitalLightRef.current.position.x = Math.sin(time * 0.5) * 8;
+            orbitalLightRef.current.position.y = Math.cos(time * 0.3) * 5;
+            orbitalLightRef.current.position.z = Math.sin(time * 0.4) * 8;
+        }
+    }
 
     // Apply dampened lighting for smooth 1-2s transitions
     if (coreLightRef.current) {
@@ -221,7 +233,7 @@ function EngineeredStructure() {
   return (
     <group ref={groupRef}>
       {/* --- Lighting Rig --- */}
-      <ambientLight ref={ambientRef} intensity={0.1} color="#0f172a" />
+      <ambientLight ref={ambientRef} intensity={0.4} color="#1e293b" />
       
       {/* Core internal light */}
       <pointLight ref={coreLightRef} position={[0, 0, 0]} distance={8} decay={2} />
