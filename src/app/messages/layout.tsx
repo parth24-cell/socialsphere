@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowLeft, MessageSquare } from "lucide-react";
 import NewChatModal from "./NewChatModal";
 import ConversationSidebar from "./ConversationSidebar";
+import { AppLayout } from "@/components/navigation/AppLayout";
 export default async function MessagesLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
@@ -42,27 +43,31 @@ export default async function MessagesLayout({ children }: { children: React.Rea
   });
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex justify-center">
-      <div className="w-full max-w-5xl border-x border-zinc-200 dark:border-zinc-800 min-h-screen bg-white dark:bg-zinc-900 flex">
+    <AppLayout user={session.user as any}>
+      <div className="w-full h-[calc(100vh-64px)] md:h-screen flex bg-zinc-950/20">
         
         {/* Left Sidebar: Conversations */}
-        <div className="w-1/3 border-r border-zinc-200 dark:border-zinc-800 flex flex-col h-screen sticky top-0 z-20">
-          <div className="p-4 border-b border-zinc-200 dark:border-zinc-800 flex items-center gap-4">
-            <Link href="/home" className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition">
-              <ArrowLeft className="w-5 h-5 text-zinc-900 dark:text-zinc-50" />
-            </Link>
-            <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-50">Messages</h1>
+        <div className="w-80 md:w-96 border-r border-white/5 flex flex-col h-full z-20 bg-zinc-900/10 backdrop-blur-sm">
+          <div className="p-4 flex items-center justify-between border-b border-white/5 bg-white/[0.01] backdrop-blur-md">
+            <div className="flex items-center gap-3">
+              <Link href="/home" className="flex p-2 hover:bg-white/5 border border-white/10 hover:border-white/20 rounded-xl transition text-white/70 hover:text-white">
+                <ArrowLeft className="w-4 h-4" />
+              </Link>
+              <h1 className="text-lg font-bold tracking-tight text-white font-heading">Messages</h1>
+            </div>
             <NewChatModal users={connectableUsers} />
           </div>
           
-          <ConversationSidebar rooms={rooms} currentUserId={session.user.id} />
+          <div className="flex-1 overflow-y-auto">
+            <ConversationSidebar rooms={rooms} currentUserId={session.user.id} />
+          </div>
         </div>
 
         {/* Right Pane: Chat Window */}
-        <div className="flex-1 h-screen sticky top-0 bg-zinc-50 dark:bg-zinc-950/50">
+        <div className="flex-1 h-full bg-zinc-950/40 relative overflow-hidden">
           {children}
         </div>
       </div>
-    </div>
+    </AppLayout>
   );
 }

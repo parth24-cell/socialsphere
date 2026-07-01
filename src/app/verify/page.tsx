@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { OTPInput } from "input-otp";
 import { Loader2 } from "lucide-react";
 import { verifyUserOTP, sendVerificationOTP } from "@/actions/auth-v2";
+import { AuthLayout } from "@/components/auth/AuthLayout";
 
 function VerifyContent() {
   const router = useRouter();
@@ -64,54 +65,92 @@ function VerifyContent() {
   };
 
   if (!email) {
-    return <div className="p-4 text-center">Missing email parameter</div>;
+    return (
+      <AuthLayout>
+        <div className="text-center p-8">
+          <p className="text-white/60">Missing email parameter. Please start registration again.</p>
+        </div>
+      </AuthLayout>
+    );
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-50 dark:bg-zinc-950 p-4">
-      <div className="w-full max-w-md space-y-8 rounded-xl bg-white dark:bg-zinc-900 p-8 shadow-md border border-zinc-200 dark:border-zinc-800">
-        <div className="text-center">
-          <h2 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">Verify Account</h2>
-          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">Please enter the 6-digit code sent to {email}</p>
-        </div>
+    <AuthLayout>
+      <div className="text-center mb-10">
+        <h2 className="text-3xl font-bold tracking-tight text-white mb-2">
+          Verify Email
+        </h2>
+        <p className="text-white/60">
+          Please enter the 6-digit code sent to <br/>
+          <span className="text-white font-medium">{email}</span>
+        </p>
+      </div>
 
-        <form className="space-y-6 flex flex-col items-center" onSubmit={handleVerify}>
-          {error && <div className="text-red-500 text-sm text-center w-full font-medium bg-red-50 dark:bg-red-900/20 p-3 rounded-md">{error}</div>}
-          
-          <OTPInput 
-            maxLength={6} 
-            value={otp} 
-            onChange={setOtp} 
-            autoFocus 
-            render={({ slots }) => (
-              <div className="flex justify-center gap-2">
-                {slots.map((slot, idx) => (
-                  <div key={idx} className={`w-12 h-12 text-lg flex items-center justify-center border ${slot.isActive ? 'border-indigo-500 ring-1 ring-indigo-500' : 'border-zinc-300 dark:border-zinc-700'} rounded-md text-zinc-900 dark:text-zinc-100 bg-transparent`}>
-                    {slot.char !== null ? slot.char : ""}
-                  </div>
-                ))}
-              </div>
-            )}
-          />
+      <form className="space-y-8 flex flex-col items-center" onSubmit={handleVerify}>
+        {error && (
+          <div className="text-red-400 text-sm text-center w-full font-medium bg-red-500/10 border border-red-500/20 p-4 rounded-xl backdrop-blur-sm animate-in fade-in slide-in-from-top-2">
+            {error}
+          </div>
+        )}
+        
+        <OTPInput 
+          maxLength={6} 
+          value={otp} 
+          onChange={setOtp} 
+          autoFocus 
+          render={({ slots }) => (
+            <div className="flex gap-2 justify-center">
+              {slots.map((slot, idx) => (
+                <div
+                  key={idx}
+                  className={`w-12 h-14 flex items-center justify-center text-xl font-semibold rounded-xl border transition-all duration-300
+                    ${slot.isActive 
+                      ? "border-amber-500 bg-white/10 shadow-[0_0_15px_rgba(245,158,11,0.3)]" 
+                      : "border-white/20 bg-white/5"
+                    } text-white
+                  `}
+                >
+                  {slot.char || (slot.isActive && <span className="w-0.5 h-6 bg-amber-500 animate-pulse" />)}
+                </div>
+              ))}
+            </div>
+          )}
+        />
 
-          <button type="submit" disabled={loading || otp.length !== 6} className="flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50">
+        <div className="w-full space-y-4">
+          <button
+            type="submit"
+            disabled={loading || otp.length !== 6}
+            className="flex w-full justify-center items-center rounded-xl bg-amber-500 hover:bg-amber-400 text-black px-4 py-3.5 text-sm font-bold shadow-[0_0_20px_rgba(245,158,11,0.3)] hover:shadow-[0_0_30px_rgba(245,158,11,0.5)] transition-all active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none"
+          >
             {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Verify Account"}
           </button>
 
           <div className="text-center text-sm w-full">
-            <button type="button" onClick={handleResend} disabled={resendCooldown > 0 || loading} className="font-medium text-indigo-600 hover:text-indigo-500 disabled:opacity-50 disabled:hover:text-indigo-600">
+            <button
+              type="button"
+              onClick={handleResend}
+              disabled={resendCooldown > 0 || loading}
+              className="font-medium text-white/60 hover:text-white transition-colors disabled:opacity-50 disabled:hover:text-white/60"
+            >
               {resendCooldown > 0 ? `Resend code in ${resendCooldown}s` : "Didn't receive a code? Resend"}
             </button>
           </div>
-        </form>
-      </div>
-    </div>
+        </div>
+      </form>
+    </AuthLayout>
   );
 }
 
 export default function VerifyPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={
+      <AuthLayout>
+        <div className="flex justify-center items-center h-[400px]">
+          <Loader2 className="w-8 h-8 animate-spin text-amber-500" />
+        </div>
+      </AuthLayout>
+    }>
       <VerifyContent />
     </Suspense>
   );

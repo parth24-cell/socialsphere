@@ -4,7 +4,10 @@ import Link from "next/link";
 import { useState, Suspense } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import { AuthLayout } from "@/components/auth/AuthLayout";
+import { AuthInput } from "@/components/auth/AuthInput";
+import { PasswordInput } from "@/components/auth/PasswordInput";
 
 function LoginContent() {
   const router = useRouter();
@@ -13,8 +16,8 @@ function LoginContent() {
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
   const [identifier, setIdentifier] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -22,7 +25,6 @@ function LoginContent() {
     setLoading(true);
 
     const formData = new FormData(e.currentTarget);
-    const password = formData.get("password") as string;
     const rememberMe = formData.get("rememberMe") === "on";
 
     try {
@@ -56,108 +58,106 @@ function LoginContent() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-50 dark:bg-zinc-950 p-4">
-      <div className="w-full max-w-md space-y-8 rounded-xl bg-white dark:bg-zinc-900 p-8 shadow-md border border-zinc-200 dark:border-zinc-800">
-        <div className="text-center">
-          <h2 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
-            Sign in to SocialSphere
-          </h2>
-          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-            Welcome back!
-          </p>
-        </div>
+    <AuthLayout>
+      <div className="text-center mb-10">
+        <h2 className="text-3xl font-bold tracking-tight text-white mb-2">
+          Sign in
+        </h2>
+        <p className="text-white/60">
+          Welcome back to SocialSphere.
+        </p>
+      </div>
 
-        <form className="space-y-6" onSubmit={handleSubmit}>
-          {verified && (
-            <div className="text-green-600 text-sm text-center font-medium bg-green-50 dark:bg-green-900/20 p-3 rounded-md">
-              Account verified! You can now log in.
-            </div>
-          )}
-          {error && (
-            <div className="text-red-500 text-sm text-center font-medium bg-red-50 dark:bg-red-900/20 p-3 rounded-md">
-              {error}
-            </div>
-          )}
-          
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                Email or Username
-              </label>
-              <input
-                type="text"
-                name="identifier"
-                required
-                value={identifier}
-                onChange={(e) => setIdentifier(e.target.value)}
-                className="mt-1 block w-full rounded-md border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 px-3 py-2 text-zinc-900 dark:text-zinc-100 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm"
-              />
-            </div>
+      <form className="space-y-6" onSubmit={handleSubmit}>
+        {verified && (
+          <div className="text-emerald-400 text-sm text-center font-medium bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-xl backdrop-blur-sm animate-in fade-in slide-in-from-top-2">
+            Account verified! You can now log in.
+          </div>
+        )}
+        
+        {error && (
+          <div className="text-red-400 text-sm text-center font-medium bg-red-500/10 border border-red-500/20 p-4 rounded-xl backdrop-blur-sm animate-in fade-in slide-in-from-top-2">
+            {error}
+          </div>
+        )}
+        
+        <div className="space-y-5">
+          <AuthInput
+            label="Email or Username"
+            type="text"
+            name="identifier"
+            required
+            value={identifier}
+            onChange={(e) => setIdentifier(e.target.value)}
+            placeholder="Enter your email or username"
+          />
 
-            <div>
-              <div className="flex items-center justify-between">
-                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                  Password
-                </label>
-                <Link href="/forgot-password" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
-                  Forgot password?
-                </Link>
-              </div>
-              <div className="relative mt-1">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  name="password"
-                  required
-                  className="block w-full rounded-md border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 px-3 py-2 pr-10 text-zinc-900 dark:text-zinc-100 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-2.5 text-zinc-400 hover:text-zinc-600"
-                >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
-              </div>
+          <div className="space-y-1">
+            <PasswordInput
+              label="Password"
+              name="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password"
+            />
+            <div className="flex justify-end pt-1">
+              <Link href="/forgot-password" className="text-sm font-medium text-amber-500 hover:text-amber-400 transition-colors">
+                Forgot password?
+              </Link>
             </div>
+          </div>
 
-            <div className="flex items-center">
+          <div className="flex items-center pt-2">
+            <div className="relative flex items-center">
               <input
                 id="rememberMe"
                 name="rememberMe"
                 type="checkbox"
-                className="h-4 w-4 rounded border-zinc-300 text-indigo-600 focus:ring-indigo-600"
+                className="peer h-5 w-5 cursor-pointer appearance-none rounded-md border border-white/20 bg-white/5 transition-all checked:border-amber-500 checked:bg-amber-500 hover:bg-white/10"
               />
-              <label htmlFor="rememberMe" className="ml-2 block text-sm text-zinc-900 dark:text-zinc-100">
-                Remember me
-              </label>
+              <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 transition-opacity peer-checked:opacity-100">
+                <svg className="h-3.5 w-3.5" viewBox="0 0 14 14" fill="none">
+                  <path d="M3 8L6 11L11 3.5" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" stroke="currentColor" />
+                </svg>
+              </div>
             </div>
+            <label htmlFor="rememberMe" className="ml-3 block text-sm font-medium text-white/80 cursor-pointer">
+              Remember me
+            </label>
           </div>
-
-          <div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50"
-            >
-              {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Sign in"}
-            </button>
-          </div>
-        </form>
-
-        <div className="text-center text-sm">
-          <span className="text-zinc-600 dark:text-zinc-400">Don't have an account? </span>
-          <Link href="/register" className="font-medium text-indigo-600 hover:text-indigo-500">
-            Sign up
-          </Link>
         </div>
+
+        <div className="pt-4">
+          <button
+            type="submit"
+            disabled={loading}
+            className="flex w-full justify-center items-center rounded-xl bg-amber-500 hover:bg-amber-400 text-black px-4 py-3.5 text-sm font-bold shadow-[0_0_20px_rgba(245,158,11,0.3)] hover:shadow-[0_0_30px_rgba(245,158,11,0.5)] transition-all active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none"
+          >
+            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Continue"}
+          </button>
+        </div>
+      </form>
+
+      <div className="mt-8 text-center text-sm text-white/60">
+        Don't have an account?{" "}
+        <Link href="/register" className="font-medium text-amber-500 hover:text-amber-400 transition-colors">
+          Sign up
+        </Link>
       </div>
-    </div>
+    </AuthLayout>
   );
 }
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={
+      <AuthLayout>
+        <div className="flex justify-center items-center h-[400px]">
+          <Loader2 className="w-8 h-8 animate-spin text-amber-500" />
+        </div>
+      </AuthLayout>
+    }>
       <LoginContent />
     </Suspense>
   );

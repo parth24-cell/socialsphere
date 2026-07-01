@@ -2,8 +2,11 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2, MailCheck } from "lucide-react";
 import { requestPasswordReset } from "@/actions/auth-v2";
+import { AuthLayout } from "@/components/auth/AuthLayout";
+import { AuthInput } from "@/components/auth/AuthInput";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function ForgotPasswordPage() {
   const [error, setError] = useState("");
@@ -33,38 +36,88 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-50 dark:bg-zinc-950 p-4">
-      <div className="w-full max-w-md space-y-8 rounded-xl bg-white dark:bg-zinc-900 p-8 shadow-md border border-zinc-200 dark:border-zinc-800">
-        <div className="text-center">
-          <h2 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">Forgot Password</h2>
-          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">Enter your email to receive a reset link</p>
-        </div>
+    <AuthLayout>
+      <div className="relative">
+        <AnimatePresence mode="wait">
+          {!success ? (
+            <motion.div
+              key="form"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.3 }}
+            >
+              <div className="text-center mb-10">
+                <h2 className="text-3xl font-bold tracking-tight text-white mb-2">
+                  Forgot Password?
+                </h2>
+                <p className="text-white/60">
+                  Enter your email address and we'll send you a link to reset your password.
+                </p>
+              </div>
 
-        {!success ? (
-          <form className="space-y-6 flex flex-col" onSubmit={handleSubmit}>
-            {error && <div className="text-red-500 text-sm text-center font-medium bg-red-50 dark:bg-red-900/20 p-3 rounded-md">{error}</div>}
-            
-            <div>
-              <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">Email address</label>
-              <input type="email" required value={email} onChange={e => setEmail(e.target.value)} className="mt-1 block w-full rounded-md border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 px-3 py-2 text-zinc-900 dark:text-zinc-100 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm" />
-            </div>
+              <form className="space-y-6 flex flex-col" onSubmit={handleSubmit}>
+                {error && (
+                  <div className="text-red-400 text-sm text-center font-medium bg-red-500/10 border border-red-500/20 p-4 rounded-xl backdrop-blur-sm">
+                    {error}
+                  </div>
+                )}
+                
+                <AuthInput
+                  label="Email address"
+                  type="email"
+                  required
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                />
 
-            <button type="submit" disabled={loading || !email} className="flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50">
-              {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Send Reset Link"}
-            </button>
-          </form>
-        ) : (
-          <div className="text-center">
-            <div className="text-green-600 font-medium bg-green-50 dark:bg-green-900/20 p-4 rounded-md mb-6">
-              If an account with that email exists, we have sent a password reset link.
-            </div>
+                <div className="pt-2">
+                  <button
+                    type="submit"
+                    disabled={loading || !email}
+                    className="flex w-full justify-center items-center rounded-xl bg-amber-500 hover:bg-amber-400 text-black px-4 py-3.5 text-sm font-bold shadow-[0_0_20px_rgba(245,158,11,0.3)] hover:shadow-[0_0_30px_rgba(245,158,11,0.5)] transition-all active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none"
+                  >
+                    {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Send Reset Link"}
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="success"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="text-center py-6"
+            >
+              <div className="mx-auto w-16 h-16 bg-emerald-500/10 text-emerald-400 rounded-full flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(52,211,153,0.3)] border border-emerald-500/20">
+                <MailCheck className="w-8 h-8" />
+              </div>
+              <h2 className="text-2xl font-bold tracking-tight text-white mb-4">
+                Check your inbox
+              </h2>
+              <p className="text-white/60 mb-8 max-w-[280px] mx-auto">
+                If an account with <span className="text-white font-medium">{email}</span> exists, we have sent a password reset link.
+              </p>
+              
+              <Link 
+                href="/login" 
+                className="inline-flex w-full justify-center items-center rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/20 px-4 py-3.5 text-sm font-medium transition-all active:scale-[0.98]"
+              >
+                Return to Login
+              </Link>
+            </motion.div>
+          )}
+        </AnimatePresence>
+        
+        {!success && (
+          <div className="mt-8 text-center text-sm w-full">
+            <Link href="/login" className="font-medium text-white/60 hover:text-white transition-colors">
+              Back to Login
+            </Link>
           </div>
         )}
-        
-        <div className="text-center text-sm w-full">
-          <Link href="/login" className="font-medium text-indigo-600 hover:text-indigo-500">Back to Login</Link>
-        </div>
       </div>
-    </div>
+    </AuthLayout>
   );
 }

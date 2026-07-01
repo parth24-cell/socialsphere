@@ -5,6 +5,7 @@ import { Plus, Loader2 } from "lucide-react";
 import { createStory } from "@/actions/story";
 import { uploadMedia } from "@/actions/post";
 import StoryViewer from "./StoryViewer";
+import { StoryRing } from "@/components/design-system/StoryRing";
 
 type Story = {
   id: string;
@@ -64,18 +65,18 @@ export default function StoriesBar({ storiesGroupedByUser, currentUserId, curren
 
   return (
     <>
-      <div className="flex gap-4 p-4 overflow-x-auto hide-scrollbar border-b border-zinc-200 dark:border-zinc-800 items-center">
+      <div className="flex gap-4 p-5 overflow-x-auto no-scrollbar items-center bg-white/[0.01] border-b border-white/5 scroll-smooth">
         {/* Create Story Button */}
         <div className="flex flex-col items-center gap-1 shrink-0">
           <div 
             onClick={() => fileInputRef.current?.click()}
-            className="w-16 h-16 rounded-full border-2 border-dashed border-zinc-300 dark:border-zinc-700 flex items-center justify-center cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800 transition relative p-[2px]"
+            className="w-14 h-14 rounded-full border border-dashed border-white/20 hover:border-amber-500/50 flex items-center justify-center cursor-pointer hover:bg-white/5 transition-all relative p-[2px]"
           >
-            <div className="w-full h-full rounded-full flex items-center justify-center bg-zinc-100 dark:bg-zinc-800">
+            <div className="w-full h-full rounded-full flex items-center justify-center bg-white/5 hover:bg-white/10 transition-colors">
               {uploading ? (
-                <Loader2 className="w-6 h-6 animate-spin text-zinc-400" />
+                <Loader2 className="w-5 h-5 animate-spin text-white/40" />
               ) : (
-                <Plus className="w-6 h-6 text-zinc-500" />
+                <Plus className="w-5 h-5 text-white/60 hover:text-white" />
               )}
             </div>
             <input 
@@ -86,14 +87,8 @@ export default function StoriesBar({ storiesGroupedByUser, currentUserId, curren
               onChange={handleFileSelect}
             />
           </div>
-          <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Add Story</span>
+          <span className="text-[10px] font-bold uppercase tracking-wider text-white/40 mt-1">Add Story</span>
         </div>
-
-        {sortedUserIds.length === 0 && (
-          <div className="text-sm text-zinc-500 dark:text-zinc-400 ml-4 font-medium">
-            No stories available
-          </div>
-        )}
 
         {/* Story Avatars */}
         {sortedUserIds.map(userId => {
@@ -103,26 +98,17 @@ export default function StoriesBar({ storiesGroupedByUser, currentUserId, curren
           
           // Check if all stories by this user are viewed
           const allViewed = stories.every(s => s.views && s.views.length > 0);
-          
-          const ringClass = isMe 
-            ? 'bg-zinc-300 dark:bg-zinc-700' // My story indicator
-            : allViewed 
-              ? 'bg-zinc-300 dark:bg-zinc-700' // Grey if all viewed
-              : 'bg-gradient-to-tr from-yellow-400 to-fuchsia-600'; // Colorful if unviewed
 
           return (
             <div key={userId} className="flex flex-col items-center gap-1 shrink-0 cursor-pointer" onClick={() => setActiveStoryUserId(userId)}>
-              <div className={`w-[60px] h-[60px] rounded-full p-[2px] ${ringClass}`}>
-                <div className="w-full h-full rounded-full border-2 border-white dark:border-zinc-950 flex items-center justify-center bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 font-bold text-xl flex-shrink-0 overflow-hidden">
-                  {user.profile?.avatarUrl ? (
-                    <img src={user.profile.avatarUrl} alt="" className="w-full h-full object-cover object-center" />
-                  ) : (
-                    (isMe ? currentUserProfile?.name?.charAt(0).toUpperCase() : user.profile?.username?.charAt(0).toUpperCase())
-                  )}
-                </div>
-              </div>
-              <span className="text-xs font-medium text-zinc-900 dark:text-zinc-50 truncate w-full text-center mt-1">
-                {isMe ? "Your Story" : user.profile?.username || "unknown"}
+              <StoryRing
+                src={user.profile?.avatarUrl}
+                fallback={isMe ? currentUserProfile?.displayName?.charAt(0).toUpperCase() || currentUserProfile?.username?.charAt(0).toUpperCase() || "?" : user.profile?.username?.charAt(0).toUpperCase() || "?"}
+                hasUnviewedStory={!allViewed}
+                size="md"
+              />
+              <span className="text-xs font-semibold text-white/70 truncate w-14 text-center mt-1">
+                {isMe ? "You" : user.profile?.username || "unknown"}
               </span>
             </div>
           );

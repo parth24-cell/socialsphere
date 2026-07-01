@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, User, Shield, Lock, Bell, Palette, Globe, Accessibility, Smartphone, Ban, Trash2 } from "lucide-react";
+import { AppLayout } from "@/components/navigation/AppLayout";
 
 export default async function SettingsLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
@@ -20,16 +21,16 @@ export default async function SettingsLayout({ children }: { children: React.Rea
   ];
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex justify-center">
-      <div className="w-full max-w-4xl flex flex-col md:flex-row min-h-screen">
+    <AppLayout user={session.user as any}>
+      <div className="w-full flex flex-col md:flex-row h-full min-h-screen">
         
         {/* Sidebar */}
-        <div className="w-full md:w-64 border-r border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shrink-0 hidden md:block">
-          <div className="p-4 border-b border-zinc-200 dark:border-zinc-800 flex items-center gap-2">
-            <Link href="/home" className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition -ml-2">
-              <ArrowLeft className="w-5 h-5 text-zinc-900 dark:text-zinc-50" />
+        <div className="w-full md:w-64 border-r border-white/10 shrink-0 hidden md:block">
+          <div className="p-4 border-b border-white/10 flex items-center gap-2">
+            <Link href="/home" className="p-2 hover:bg-white/10 rounded-full transition -ml-2">
+              <ArrowLeft className="w-5 h-5 text-white" />
             </Link>
-            <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-50">Settings</h1>
+            <h1 className="text-xl font-bold font-heading text-white">Settings</h1>
           </div>
           
           <nav className="p-2 flex flex-col gap-1">
@@ -37,14 +38,14 @@ export default async function SettingsLayout({ children }: { children: React.Rea
               <Link 
                 key={item.href} 
                 href={item.href}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition"
+                className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-slate-300 hover:text-white transition"
               >
                 <item.icon className="w-5 h-5" />
                 <span className="font-medium">{item.name}</span>
               </Link>
             ))}
 
-            <div className="my-2 border-t border-zinc-200 dark:border-zinc-800" />
+            <div className="my-2 border-t border-white/10" />
             
             <Link 
               href="/settings/delete-account"
@@ -57,12 +58,12 @@ export default async function SettingsLayout({ children }: { children: React.Rea
         </div>
 
         {/* Main Content */}
-        <main className="flex-1 bg-white dark:bg-zinc-900">
-          <div className="md:hidden sticky top-0 z-10 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-800 px-4 py-3 flex items-center gap-4">
-            <Link href="/home" className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition -ml-2">
-              <ArrowLeft className="w-5 h-5 text-zinc-900 dark:text-zinc-50" />
+        <main className="flex-1 bg-background">
+          <div className="md:hidden sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-white/10 px-4 py-3 flex items-center gap-4">
+            <Link href="/home" className="p-2 hover:bg-white/10 rounded-full transition -ml-2">
+              <ArrowLeft className="w-5 h-5 text-white" />
             </Link>
-            <h1 className="text-lg font-bold text-zinc-900 dark:text-zinc-50">Settings</h1>
+            <h1 className="text-lg font-bold font-heading text-white">Settings</h1>
           </div>
           <div className="p-6">
             {children}
@@ -70,6 +71,6 @@ export default async function SettingsLayout({ children }: { children: React.Rea
         </main>
 
       </div>
-    </div>
+    </AppLayout>
   );
 }

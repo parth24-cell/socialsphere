@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import UserList from "@/components/UserList";
+import { AppLayout } from "@/components/navigation/AppLayout";
 
 export default async function FollowersPage({ params }: { params: Promise<{ username: string }> }) {
   const resolvedParams = await params;
@@ -43,29 +44,49 @@ export default async function FollowersPage({ params }: { params: Promise<{ user
   });
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex justify-center">
-      <main className="w-full max-w-2xl border-x border-zinc-200 dark:border-zinc-800 min-h-screen bg-white dark:bg-zinc-900">
-        <div className="sticky top-0 z-10 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-800 px-4 py-3 flex items-center gap-6">
-          <Link href={`/${resolvedParams.username}`} className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition">
-            <ArrowLeft className="w-5 h-5 text-zinc-900 dark:text-zinc-50" />
-          </Link>
-          <div>
-            <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-50">{profileUser.profile.displayName || profileUser.profile.username}</h1>
-            <p className="text-sm text-zinc-500">Followers</p>
+    <AppLayout user={session?.user as any}>
+      <div className="flex w-full justify-center max-w-7xl mx-auto gap-8 px-4 sm:px-6">
+        
+        {/* Main List Column */}
+        <div className="flex-1 max-w-[660px] w-full min-h-screen border-r border-white/5 pb-24">
+          
+          {/* Header Panel */}
+          <div className="sticky top-0 z-20 bg-zinc-950/60 backdrop-blur-xl border-b border-white/5 px-6 py-4 flex items-center gap-4 shrink-0">
+            <Link href={`/${resolvedParams.username}`} className="p-2.5 bg-white/5 border border-white/10 hover:border-white/20 rounded-xl transition text-white/80 hover:text-white active:scale-95">
+              <ArrowLeft className="w-4 h-4" />
+            </Link>
+            <div>
+              <h1 className="text-base font-bold text-white leading-tight font-heading">
+                {profileUser.profile.displayName || profileUser.profile.username}
+              </h1>
+              <p className="text-[10px] uppercase tracking-wider text-white/40 mt-0.5">Relations</p>
+            </div>
+          </div>
+
+          {/* Tab Links */}
+          <div className="flex border-b border-white/5 select-none bg-white/[0.002]">
+            <Link 
+              href={`/${resolvedParams.username}/followers`} 
+              className="flex-1 text-center py-4 font-bold text-xs uppercase tracking-wider text-amber-500 border-b-2 border-amber-500 bg-white/[0.005]"
+            >
+              Followers
+            </Link>
+            <Link 
+              href={`/${resolvedParams.username}/following`} 
+              className="flex-1 text-center py-4 font-bold text-xs uppercase tracking-wider text-white/40 hover:text-white transition-colors"
+            >
+              Following
+            </Link>
+          </div>
+
+          <div className="pt-2">
+            <UserList users={formattedUsers} currentUserId={currentUserId} />
           </div>
         </div>
 
-        <div className="flex border-b border-zinc-200 dark:border-zinc-800">
-          <Link href={`/${resolvedParams.username}/followers`} className="flex-1 text-center py-3 font-medium text-indigo-600 border-b-2 border-indigo-600 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition">
-            Followers
-          </Link>
-          <Link href={`/${resolvedParams.username}/following`} className="flex-1 text-center py-3 font-medium text-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition">
-            Following
-          </Link>
-        </div>
-
-        <UserList users={formattedUsers} currentUserId={currentUserId} />
-      </main>
-    </div>
+        {/* Info panel sidebar placeholder */}
+        <div className="hidden lg:block w-[320px] py-6 h-screen sticky top-0" />
+      </div>
+    </AppLayout>
   );
 }

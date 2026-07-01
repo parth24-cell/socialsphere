@@ -52,7 +52,7 @@ const DoubleTick = ({ isSeen }: { isSeen: boolean }) => (
     viewBox="0 0 24 24" 
     width="15" 
     height="15" 
-    className={`shrink-0 ${isSeen ? "text-sky-500" : "text-zinc-400 dark:text-zinc-500"}`}
+    className={`shrink-0 ${isSeen ? "text-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.5)]" : "text-white/20"}`}
     fill="none" 
     stroke="currentColor" 
     strokeWidth="2" 
@@ -594,32 +594,32 @@ export default function ChatClient({
 
   return (
     <div 
-      className="flex flex-row h-full relative w-full overflow-hidden bg-zinc-50 dark:bg-zinc-950"
+      className="flex flex-row h-full relative w-full overflow-hidden bg-transparent"
       onDragOver={handleDragOver}
       onDrop={handleDrop}
     >
       {/* Active Area */}
-      <div className="flex flex-col flex-1 h-full relative min-w-0 border-r border-zinc-200 dark:border-zinc-800">
+      <div className="flex flex-col flex-1 h-full relative min-w-0 border-r border-white/5">
         
         {/* Header */}
-        <div className="px-6 py-4 border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md sticky top-0 z-10 flex items-center justify-between shrink-0">
+        <div className="px-6 py-4 border-b border-white/5 bg-zinc-950/40 backdrop-blur-md sticky top-0 z-10 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center font-bold text-indigo-600 flex-shrink-0 relative overflow-hidden">
+            <div className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center font-bold text-white/60 flex-shrink-0 relative overflow-hidden">
               {otherUser?.profile?.avatarUrl ? (
                 <img src={otherUser.profile.avatarUrl} alt="Avatar" className="w-full h-full object-cover object-center" />
               ) : (
                 otherUser?.profile?.username?.charAt(0).toUpperCase() || "?"
               )}
               {isOnline && (
-                <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white dark:border-zinc-900 rounded-full"></div>
+                <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-zinc-950 rounded-full"></div>
               )}
             </div>
             <div>
-              <Link href={`/${otherUser?.profile?.username}`} className="font-bold text-zinc-900 dark:text-zinc-50 hover:underline flex items-center gap-1.5">
+              <Link href={`/${otherUser?.profile?.username}`} className="font-bold text-white hover:underline flex items-center gap-1.5 text-sm sm:text-base">
                 {conversation.type === "GROUP" ? conversation.name : (otherUser?.profile?.displayName || otherUser?.profile?.username)}
               </Link>
-              <p className="text-xs text-zinc-500">
-                {isOnline ? (isIdle ? "Idle" : "Online") : otherLastSeen ? `Last seen: ${new Date(otherLastSeen).toLocaleTimeString('en-US', { hour: "2-digit", minute: "2-digit" })}` : "Offline"}
+              <p className="text-[10px] sm:text-xs text-white/40 mt-0.5">
+                {isOnline ? (isIdle ? "Idle" : "Active now") : otherLastSeen ? `Last seen: ${new Date(otherLastSeen).toLocaleTimeString('en-US', { hour: "2-digit", minute: "2-digit" })}` : "Offline"}
               </p>
             </div>
           </div>
@@ -627,26 +627,26 @@ export default function ChatClient({
           <div className="flex items-center gap-2">
             <button 
               onClick={() => setShowSearch(!showSearch)} 
-              className={`p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 transition ${showSearch ? 'text-indigo-600' : 'text-zinc-500'}`}
+              className={`p-2 rounded-xl hover:bg-white/5 border border-transparent hover:border-white/10 transition ${showSearch ? 'text-amber-500 bg-white/5 border-white/10' : 'text-white/60 hover:text-white'}`}
             >
-              <Search className="w-5 h-5" />
+              <Search className="w-4 h-4" />
             </button>
             <button 
               onClick={() => setShowGallery(!showGallery)}
-              className={`p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 transition ${showGallery ? 'text-indigo-600' : 'text-zinc-500'}`}
+              className={`p-2 rounded-xl hover:bg-white/5 border border-transparent hover:border-white/10 transition ${showGallery ? 'text-amber-500 bg-white/5 border-white/10' : 'text-white/60 hover:text-white'}`}
             >
-              <FolderOpen className="w-5 h-5" />
+              <FolderOpen className="w-4 h-4" />
             </button>
           </div>
         </div>
 
         {/* Pinned Messages Header Bar */}
         {pinnedMessages.length > 0 && (
-          <div className="bg-indigo-50/70 dark:bg-indigo-950/20 px-6 py-2 border-b border-indigo-100 dark:border-indigo-900/50 flex items-center justify-between text-xs text-indigo-700 dark:text-indigo-300">
+          <div className="bg-amber-500/10 px-6 py-2.5 border-b border-amber-500/20 flex items-center justify-between text-xs text-amber-500">
             <div className="flex items-center gap-2 truncate">
               <Pin className="w-3.5 h-3.5 shrink-0 rotate-45" />
-              <span className="font-semibold">Pinned:</span>
-              <span className="truncate italic">
+              <span className="font-bold uppercase tracking-wider text-[10px]">Pinned:</span>
+              <span className="truncate italic opacity-80">
                 {pinnedMessages[pinnedMessages.length - 1].content || "Media Attachment"}
               </span>
             </div>
@@ -655,7 +655,7 @@ export default function ChatClient({
                 const pinId = pinnedMessages[pinnedMessages.length - 1].id;
                 document.getElementById(`msg-${pinId}`)?.scrollIntoView({ behavior: "smooth" });
               }}
-              className="text-indigo-600 dark:text-indigo-400 font-bold hover:underline shrink-0"
+              className="font-bold hover:underline shrink-0 text-xs text-amber-400"
             >
               Jump to Pin
             </button>
@@ -671,8 +671,8 @@ export default function ChatClient({
           {/* eslint-disable-next-line react-hooks/refs */}
           {messagesGroupedByDate.map((group) => (
             <div key={group.date} className="space-y-4">
-              <div className="flex justify-center my-4">
-                <span className="text-[10px] uppercase tracking-wider font-bold text-zinc-400 bg-zinc-200/50 dark:bg-zinc-800/50 px-2.5 py-1 rounded-full">
+              <div className="flex justify-center my-6">
+                <span className="text-[10px] uppercase tracking-widest font-bold text-white/40 bg-white/5 border border-white/10 px-3 py-1 rounded-full backdrop-blur-sm">
                   {group.date}
                 </span>
               </div>
@@ -704,7 +704,7 @@ export default function ChatClient({
                     {!isMe && (
                       <div className="w-8 h-8 shrink-0">
                         {showAvatar && (
-                          <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center font-bold text-indigo-600 text-xs flex-shrink-0 overflow-hidden">
+                          <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center font-bold text-white/40 text-xs flex-shrink-0 overflow-hidden">
                             {msg.sender?.profile?.avatarUrl ? (
                               <img src={msg.sender.profile.avatarUrl} alt="Avatar" className="w-full h-full object-cover object-center" />
                             ) : (
@@ -714,19 +714,17 @@ export default function ChatClient({
                         )}
                       </div>
                     )}
-                    
                     <div className={`flex flex-col gap-1.5 max-w-[65%] relative ${isMe ? "items-end" : "items-start"}`}>
-                      
                       {/* Quoted Message Reply Preview */}
                       {msg.replyToMessage && (
                         <div 
                           onClick={() => document.getElementById(`msg-${msg.replyToMessage.id}`)?.scrollIntoView({ behavior: "smooth" })}
-                          className={`text-xs p-2.5 rounded-lg border cursor-pointer border-zinc-200 dark:border-zinc-800 bg-zinc-100/80 dark:bg-zinc-900/60 max-w-full truncate ${isMe ? 'rounded-br-none border-r-4 border-r-indigo-500' : 'rounded-bl-none border-l-4 border-l-zinc-500'}`}
+                          className={`text-xs p-2.5 rounded-xl border cursor-pointer border-white/5 bg-white/[0.02] max-w-full truncate ${isMe ? 'rounded-br-none border-r-2 border-r-amber-500' : 'rounded-bl-none border-l-2 border-l-white/40'}`}
                         >
-                          <p className="font-bold text-[10px] uppercase text-zinc-400">
+                          <p className="font-bold text-[9px] uppercase tracking-wider text-white/40">
                             Replying to {msg.replyToMessage.senderId === currentUserId ? "You" : (msg.replyToMessage.sender?.profile?.username || "user")}
                           </p>
-                          <p className="truncate text-zinc-500 dark:text-zinc-400">
+                          <p className="truncate text-white/60 mt-0.5">
                             {msg.replyToMessage.isDeleted ? "This message was deleted." : (msg.replyToMessage.content || "Media / Voice attachment")}
                           </p>
                         </div>
@@ -752,22 +750,22 @@ export default function ChatClient({
                                   key={att.id} 
                                   src={att.url} 
                                   controls 
-                                  className="rounded-xl border border-zinc-200 dark:border-zinc-800 max-h-64 max-w-full bg-black"
+                                  className="rounded-xl border border-white/5 max-h-64 max-w-full bg-black"
                                 />
                               );
                             } else {
                               return (
-                                <div key={att.id} className="flex items-center gap-3 p-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl">
+                                <div key={att.id} className="flex items-center gap-3 p-3 bg-white/5 border border-white/10 rounded-xl">
                                   {att.name?.endsWith(".zip") ? (
-                                    <FileArchive className="w-8 h-8 text-yellow-600" />
+                                    <FileArchive className="w-8 h-8 text-amber-500" />
                                   ) : (
-                                    <FileText className="w-8 h-8 text-indigo-600" />
+                                    <FileText className="w-8 h-8 text-white/60" />
                                   )}
                                   <div className="flex-1 min-w-0">
-                                    <p className="text-xs font-bold truncate text-zinc-800 dark:text-zinc-200">{att.name || "Attachment"}</p>
-                                    <p className="text-[10px] text-zinc-400">{(att.size ? `${(att.size / 1024).toFixed(1)} KB` : "")}</p>
+                                    <p className="text-xs font-bold truncate text-white">{att.name || "Attachment"}</p>
+                                    <p className="text-[10px] text-white/40">{(att.size ? `${(att.size / 1024).toFixed(1)} KB` : "")}</p>
                                   </div>
-                                  <a href={att.url} download className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition text-zinc-500">
+                                  <a href={att.url} download className="p-2 hover:bg-white/5 rounded-xl transition text-white/60 hover:text-white">
                                     <Download className="w-4 h-4" />
                                   </a>
                                 </div>
@@ -792,8 +790,8 @@ export default function ChatClient({
                         return (
                           <div className={`flex items-center gap-3.5 p-3 rounded-2xl w-72 max-w-full select-none ${
                             isMe 
-                              ? 'bg-indigo-600 text-white rounded-br-sm shadow-md shadow-indigo-600/10' 
-                              : 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-50 border border-zinc-200 dark:border-zinc-800 rounded-bl-sm shadow-sm'
+                              ? 'bg-white/10 text-white rounded-br-sm shadow-md border border-white/10' 
+                              : 'bg-white/[0.03] text-white/90 border border-white/5 rounded-bl-sm shadow-sm'
                           }`}>
                             {/* Play/Pause Button */}
                             <button 
@@ -864,10 +862,10 @@ export default function ChatClient({
                             {/* Playback Speed selector */}
                             <button 
                               onClick={() => changeAudioSpeed(audioSpeed === 1 ? 1.5 : audioSpeed === 1.5 ? 2 : 1)}
-                              className={`text-[10px] font-bold px-1.5 py-0.5 rounded border transition shrink-0 whitespace-nowrap active:scale-95 ${
+                              className={`text-[10px] font-bold px-1.5 py-0.5 rounded-lg border transition shrink-0 whitespace-nowrap active:scale-95 ${
                                 isMe 
-                                  ? 'border-white/40 text-white hover:bg-white/10' 
-                                  : 'border-zinc-300 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                                  ? 'border-white/20 text-white/80 hover:bg-white/10' 
+                                  : 'border-white/10 text-white/60 hover:bg-white/5'
                               }`}
                             >
                               {audioSpeed}x
@@ -901,10 +899,10 @@ export default function ChatClient({
                           ) : (
                             <div className={`px-4 py-2.5 text-sm leading-relaxed rounded-2xl break-words whitespace-pre-wrap select-text ${
                               msg.isDeleted
-                                ? "italic bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 border border-zinc-200 dark:border-zinc-800 rounded-bl-sm"
+                                ? "italic bg-white/[0.02] text-white/30 border border-white/5 rounded-bl-sm"
                                 : isMe 
-                                  ? "bg-indigo-600 text-white rounded-br-sm shadow-sm" 
-                                  : "bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-50 border border-zinc-200 dark:border-zinc-800 rounded-bl-sm shadow-sm"
+                                  ? "bg-white/10 text-white border border-white/10 rounded-br-sm shadow-md" 
+                                  : "bg-white/[0.03] text-white/80 border border-white/5 rounded-bl-sm shadow-sm"
                             }`}>
                               {msg.content}
                             </div>
@@ -914,7 +912,7 @@ export default function ChatClient({
 
                       {/* Emoji Reactions List Display */}
                       {msg.reactions && msg.reactions.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-1 bg-white dark:bg-zinc-900 px-2 py-0.5 rounded-full border border-zinc-200 dark:border-zinc-800 shadow-sm text-xs select-none">
+                        <div className="flex flex-wrap gap-1 mt-1 bg-zinc-900 px-2 py-0.5 rounded-full border border-white/10 shadow-sm text-[10px] select-none">
                           {Array.from(new Set(msg.reactions.map((r: any) => r.emoji))).map((emoji: any) => {
                             const count = msg.reactions.filter((r: any) => r.emoji === emoji).length;
                             return (
@@ -943,25 +941,25 @@ export default function ChatClient({
                           <DoubleTick isSeen={isSeen} />
                         )}
                         {msg.isPinned && (
-                          <Pin className="w-3 h-3 text-indigo-500 rotate-45 shrink-0" />
+                          <Pin className="w-3 h-3 text-amber-500 rotate-45 shrink-0" />
                         )}
                       </div>
 
-                      {/* Message Actions Trigger Button & Inline Reactions bar (Hover triggers) */}
+                      {/* Message Actions Trigger Button & Inline React */}
                       {!msg.isDeleted && (
-                        <div className={`absolute top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition z-20 ${isMe ? 'left-0 -translate-x-full pr-2' : 'right-0 translate-x-full pl-2'}`}>
+                        <div className={`absolute top-1/2 -translate-y-1/2 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition z-20 ${isMe ? 'left-0 -translate-x-full pr-2' : 'right-0 translate-x-full pl-2'}`}>
                           
                           {/* Mini Reaction Trigger */}
                           <div className="relative">
                             <button 
                               onClick={() => setActiveReactionPickerId(activeReactionPickerId === msg.id ? null : msg.id)}
-                              className="p-1.5 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-full hover:bg-zinc-50 dark:hover:bg-zinc-900 transition text-zinc-400 hover:text-indigo-500"
+                              className="p-1.5 bg-zinc-900 border border-white/10 rounded-xl hover:bg-white/5 transition text-white/60 hover:text-white"
                             >
                               <Smile className="w-3.5 h-3.5" />
                             </button>
                             
                             {activeReactionPickerId === msg.id && (
-                              <div className="absolute bottom-full mb-1 flex items-center gap-1.5 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-1.5 rounded-full shadow-lg z-50">
+                              <div className="absolute bottom-full mb-1.5 flex items-center gap-1.5 bg-zinc-900 border border-white/10 p-1.5 rounded-2xl shadow-xl z-50">
                                 {REACTION_EMOJIS.map((emoji) => (
                                   <button 
                                     key={emoji} 
@@ -978,7 +976,7 @@ export default function ChatClient({
                           {/* Quick Reply Button */}
                           <button 
                             onClick={() => setReplyToMessage(msg)}
-                            className="p-1.5 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-full hover:bg-zinc-50 dark:hover:bg-zinc-900 transition text-zinc-400 hover:text-indigo-500"
+                            className="p-1.5 bg-zinc-900 border border-white/10 rounded-xl hover:bg-white/5 transition text-white/60 hover:text-white"
                           >
                             <ReplyIcon className="w-3.5 h-3.5" />
                           </button>
@@ -987,16 +985,16 @@ export default function ChatClient({
                           <div className="relative">
                             <button 
                               onClick={() => setActiveMenuId(activeMenuId === msg.id ? null : msg.id)}
-                              className="p-1.5 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-full hover:bg-zinc-50 dark:hover:bg-zinc-900 transition text-zinc-400"
+                              className="p-1.5 bg-zinc-900 border border-white/10 rounded-xl hover:bg-white/5 transition text-white/60"
                             >
                               <MoreVertical className="w-3.5 h-3.5" />
                             </button>
                             
                             {activeMenuId === msg.id && (
-                              <div className="absolute bottom-full right-0 mb-1 w-36 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-lg py-1 z-50 text-xs">
+                              <div className="absolute bottom-full right-0 mb-1.5 w-36 bg-zinc-900 border border-white/10 rounded-xl shadow-xl py-1 z-50 text-[11px]">
                                 <button 
                                   onClick={() => handleTogglePin(msg.id)} 
-                                  className="w-full text-left px-3 py-1.5 hover:bg-zinc-50 dark:hover:bg-zinc-900 flex items-center gap-2 text-zinc-700 dark:text-zinc-300"
+                                  className="w-full text-left px-3 py-2 hover:bg-white/5 flex items-center gap-2 text-white/80"
                                 >
                                   <Pin className="w-3.5 h-3.5 rotate-45" /> {msg.isPinned ? "Unpin" : "Pin"}
                                 </button>
@@ -1007,7 +1005,7 @@ export default function ChatClient({
                                       setEditInput(msg.content || "");
                                       setActiveMenuId(null);
                                     }} 
-                                    className="w-full text-left px-3 py-1.5 hover:bg-zinc-50 dark:hover:bg-zinc-900 flex items-center gap-2 text-zinc-700 dark:text-zinc-300"
+                                    className="w-full text-left px-3 py-2 hover:bg-white/5 flex items-center gap-2 text-white/80"
                                   >
                                     <Edit3 className="w-3.5 h-3.5" /> Edit
                                   </button>
@@ -1017,7 +1015,7 @@ export default function ChatClient({
                                     handleDeleteMessage(msg.id, "ME");
                                     setActiveMenuId(null);
                                   }}
-                                  className="w-full text-left px-3 py-1.5 hover:bg-zinc-50 dark:hover:bg-zinc-900 flex items-center gap-2 text-red-600"
+                                  className="w-full text-left px-3 py-2 hover:bg-white/5 flex items-center gap-2 text-red-400"
                                 >
                                   <Trash2 className="w-3.5 h-3.5" /> Delete for Me
                                 </button>
@@ -1027,7 +1025,7 @@ export default function ChatClient({
                                       handleDeleteMessage(msg.id, "EVERYONE");
                                       setActiveMenuId(null);
                                     }}
-                                    className="w-full text-left px-3 py-1.5 hover:bg-zinc-50 dark:hover:bg-zinc-900 flex items-center gap-2 text-red-600 font-bold"
+                                    className="w-full text-left px-3 py-2 hover:bg-white/5 flex items-center gap-2 text-red-400 font-bold"
                                   >
                                     <Trash2 className="w-3.5 h-3.5" /> Delete for All
                                   </button>
@@ -1045,14 +1043,14 @@ export default function ChatClient({
           ))}
           
           {isOtherUserTyping && (
-            <div className="flex gap-3 justify-start">
-              <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center font-bold text-indigo-600 text-xs shrink-0">
+            <div className="flex gap-3 justify-start items-center">
+              <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center font-bold text-white/40 text-xs shrink-0">
                 {otherUser?.profile?.username?.charAt(0).toUpperCase() || "?"}
               </div>
-              <div className="px-4 py-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl rounded-bl-sm flex gap-1 items-center shadow-sm">
-                <span className="w-1.5 h-1.5 bg-zinc-400 rounded-full animate-bounce"></span>
-                <span className="w-1.5 h-1.5 bg-zinc-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></span>
-                <span className="w-1.5 h-1.5 bg-zinc-400 rounded-full animate-bounce" style={{ animationDelay: "0.4s" }}></span>
+              <div className="px-4 py-3 bg-white/[0.03] border border-white/5 rounded-2xl rounded-bl-sm flex gap-1 items-center shadow-sm">
+                <span className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-bounce"></span>
+                <span className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></span>
+                <span className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-bounce" style={{ animationDelay: "0.4s" }}></span>
               </div>
             </div>
           )}
@@ -1064,41 +1062,41 @@ export default function ChatClient({
         {showScrollDown && (
           <button 
             onClick={() => scrollToBottom()}
-            className="absolute bottom-24 right-6 p-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-full shadow-lg text-indigo-600 dark:text-indigo-400 hover:scale-105 transition z-30"
+            className="absolute bottom-24 right-6 p-3 bg-zinc-900 border border-white/10 rounded-xl shadow-xl text-amber-500 hover:scale-105 active:scale-95 hover:border-amber-500/30 transition z-30 backdrop-blur-md"
           >
-            <ArrowDown className="w-5 h-5 animate-bounce" />
+            <ArrowDown className="w-4 h-4 animate-bounce" />
           </button>
         )}
 
         {/* Message composer / Message Request Box */}
-        <div className="p-4 bg-white dark:bg-zinc-900 border-t border-zinc-200 dark:border-zinc-800 shrink-0">
+        <div className="p-4 bg-zinc-950/40 border-t border-white/5 shrink-0 backdrop-blur-md">
           
           {myMembershipStatus === "PENDING" ? (
-            <div className="flex flex-col items-center justify-center p-4 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl space-y-3">
+            <div className="flex flex-col items-center justify-center p-5 bg-white/[0.02] border border-white/10 rounded-2xl space-y-4">
               <div className="text-center">
-                <p className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
+                <p className="text-sm font-bold text-white">
                   Accept message request from @{otherUser?.profile?.username}?
                 </p>
-                <p className="text-xs text-zinc-500 mt-1">
+                <p className="text-xs text-white/40 mt-1 max-w-xs mx-auto">
                   They won't know you've seen their messages until you accept.
                 </p>
               </div>
               <div className="flex gap-2">
                 <button 
                   onClick={() => handleRequestAction("ACCEPT")}
-                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold transition flex items-center gap-1.5"
+                  className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-black rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-[0_0_15px_rgba(245,158,11,0.2)]"
                 >
                   <UserCheck className="w-3.5 h-3.5" /> Accept
                 </button>
                 <button 
                   onClick={() => handleRequestAction("IGNORE")}
-                  className="px-4 py-2 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 rounded-lg text-xs font-semibold transition"
+                  className="px-4 py-2 bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-xl text-xs font-semibold transition"
                 >
                   Ignore
                 </button>
                 <button 
                   onClick={() => handleRequestAction("BLOCK")}
-                  className="px-4 py-2 bg-red-50/50 hover:bg-red-50 dark:bg-red-950/20 dark:hover:bg-red-950/40 text-red-600 rounded-lg text-xs font-bold transition"
+                  className="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-xl text-xs font-bold transition"
                 >
                   Block
                 </button>
@@ -1109,24 +1107,24 @@ export default function ChatClient({
               
               {/* Attachment Previews */}
               {attachments.length > 0 && (
-                <div className="flex flex-wrap gap-2.5 p-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl">
+                <div className="flex flex-wrap gap-2.5 p-2.5 bg-white/[0.02] border border-white/10 rounded-2xl">
                   {attachments.map((att, i) => (
                     <div key={i} className="relative group shrink-0">
                       {att.type === "IMAGE" ? (
-                        <img src={att.preview} alt="" className="w-16 h-16 object-cover rounded-lg border border-zinc-200 dark:border-zinc-700" />
+                        <img src={att.preview} alt="" className="w-16 h-16 object-cover rounded-xl border border-white/10" />
                       ) : att.type === "VIDEO" ? (
-                        <div className="w-16 h-16 bg-black flex items-center justify-center rounded-lg border border-zinc-200 dark:border-zinc-700">
+                        <div className="w-16 h-16 bg-black flex items-center justify-center rounded-xl border border-white/10">
                           <Play className="w-5 h-5 text-white" />
                         </div>
                       ) : (
-                        <div className="w-16 h-16 bg-indigo-50 dark:bg-indigo-950/50 flex flex-col items-center justify-center rounded-lg border border-zinc-200 dark:border-zinc-700 p-1 text-center">
-                          <FileText className="w-5 h-5 text-indigo-500" />
-                          <span className="text-[8px] truncate max-w-full text-zinc-500">{att.file.name}</span>
+                        <div className="w-16 h-16 bg-white/5 flex flex-col items-center justify-center rounded-xl border border-white/10 p-1 text-center">
+                          <FileText className="w-5 h-5 text-white/40" />
+                          <span className="text-[8px] truncate max-w-full text-white/40 mt-1">{att.file.name}</span>
                         </div>
                       )}
                       <button 
                         onClick={() => setAttachments((prev) => prev.filter((_, idx) => idx !== i))}
-                        className="absolute -top-1.5 -right-1.5 p-1 bg-red-600 hover:bg-red-700 text-white rounded-full transition"
+                        className="absolute -top-1.5 -right-1.5 p-1 bg-red-500 hover:bg-red-400 text-white rounded-full transition"
                       >
                         <X className="w-3 h-3" />
                       </button>
@@ -1137,16 +1135,16 @@ export default function ChatClient({
 
               {/* Reply Preview Bar */}
               {replyToMessage && (
-                <div className="flex items-center justify-between p-3 bg-zinc-50 dark:bg-zinc-950 border-l-4 border-l-indigo-600 border border-zinc-200 dark:border-zinc-800 rounded-r-lg">
+                <div className="flex items-center justify-between p-3 bg-white/[0.02] border-l-2 border-l-amber-500 border border-white/5 rounded-r-xl">
                   <div className="min-w-0">
-                    <p className="text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                    <p className="text-xs font-bold text-white">
                       Replying to {replyToMessage.senderId === currentUserId ? "You" : `@${replyToMessage.sender?.profile?.username}`}
                     </p>
-                    <p className="text-xs text-zinc-500 truncate mt-0.5">
+                    <p className="text-xs text-white/40 truncate mt-0.5">
                       {replyToMessage.content || "Media Attachment"}
                     </p>
                   </div>
-                  <button onClick={() => setReplyToMessage(null)} className="p-1 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-full transition text-zinc-400">
+                  <button onClick={() => setReplyToMessage(null)} className="p-1 hover:bg-white/5 border border-white/10 rounded-lg transition text-white/40 hover:text-white">
                     <X className="w-4 h-4" />
                   </button>
                 </div>
@@ -1154,29 +1152,29 @@ export default function ChatClient({
 
               {/* Progress Bar Mock */}
               {uploadProgress !== null && (
-                <div className="w-full bg-zinc-200 dark:bg-zinc-800 h-1.5 rounded-full overflow-hidden">
-                  <div className="bg-indigo-600 h-full transition-all duration-300" style={{ width: `${uploadProgress}%` }} />
+                <div className="w-full bg-white/5 h-1 rounded-full overflow-hidden">
+                  <div className="bg-amber-500 h-full transition-all duration-300" style={{ width: `${uploadProgress}%` }} />
                 </div>
               )}
 
               {/* Form Input Composer */}
               <form onSubmit={handleSend} className="flex items-end gap-3">
-                <label className="p-3.5 text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 bg-zinc-100 dark:bg-zinc-850 hover:bg-zinc-200/50 dark:hover:bg-zinc-800 rounded-full cursor-pointer transition shrink-0">
+                <label className="p-3 text-white/60 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-xl cursor-pointer transition-all active:scale-95 shrink-0">
                   <ImageIcon className="w-5 h-5" />
                   <input type="file" className="hidden" multiple onChange={handleFileChange} ref={fileInputRef} />
                 </label>
                 
                 {isRecording ? (
-                  <div className="flex-1 flex items-center justify-between bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/50 rounded-full px-5 py-2.5">
+                  <div className="flex-1 flex items-center justify-between bg-red-500/10 border border-red-500/20 rounded-xl px-5 py-2.5">
                     <div className="flex items-center gap-3">
-                      <span className="w-2.5 h-2.5 bg-red-600 rounded-full animate-ping shrink-0" />
-                      <span className="text-xs font-semibold text-red-600 dark:text-red-400">
-                        Recording voice... {recordingDuration}s
+                      <span className="w-2 h-2 bg-red-500 rounded-full animate-ping shrink-0" />
+                      <span className="text-xs font-bold text-red-400">
+                        Recording... {recordingDuration}s
                       </span>
                       {/* Form Waveform simulation visual */}
                       <div className="flex items-end gap-[2px] h-4">
                         {recordingWaveform.map((h, idx) => (
-                          <div key={idx} className="w-[1.5px] bg-red-500 rounded-full" style={{ height: `${h / 1.5}px` }} />
+                          <div key={idx} className="w-[1.5px] bg-red-400 rounded-full" style={{ height: `${h / 1.5}px` }} />
                         ))}
                       </div>
                     </div>
@@ -1184,14 +1182,14 @@ export default function ChatClient({
                       <button 
                         type="button" 
                         onClick={cancelRecording}
-                        className="px-3 py-1 bg-zinc-200 hover:bg-zinc-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 rounded-full text-xs font-semibold transition"
+                        className="px-3 py-1 bg-white/5 hover:bg-white/10 text-white rounded-lg text-xs font-semibold transition"
                       >
                         Cancel
                       </button>
                       <button 
                         type="button" 
                         onClick={stopRecording}
-                        className="px-3.5 py-1 bg-red-600 hover:bg-red-700 text-white rounded-full text-xs font-bold transition flex items-center gap-1"
+                        className="px-3 py-1 bg-red-500 hover:bg-red-400 text-white rounded-lg text-xs font-bold transition flex items-center gap-1 shadow-[0_0_10px_rgba(239,68,68,0.2)]"
                       >
                         Send
                       </button>
@@ -1203,7 +1201,7 @@ export default function ChatClient({
                     value={input}
                     onChange={handleTyping}
                     placeholder="Type a message..."
-                    className="flex-1 bg-zinc-100 dark:bg-zinc-850 rounded-full px-5 py-3 text-zinc-900 dark:text-zinc-50 outline-none focus:ring-2 focus:ring-indigo-500/50 transition border border-transparent dark:border-zinc-800 focus:bg-white dark:focus:bg-zinc-900"
+                    className="flex-1 bg-white/5 border border-white/10 focus:border-amber-500 hover:bg-white/10 rounded-xl px-5 py-3 text-white outline-none transition-all placeholder:text-white/30 text-sm focus:bg-zinc-900"
                   />
                 )}
 
@@ -1211,7 +1209,7 @@ export default function ChatClient({
                   <button 
                     type="button" 
                     onClick={startRecording}
-                    className="p-3.5 bg-indigo-50 dark:bg-indigo-950/50 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 rounded-full transition shrink-0"
+                    className="p-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 hover:text-white rounded-xl transition-all active:scale-95 shrink-0"
                   >
                     <Mic className="w-5 h-5" />
                   </button>
@@ -1220,7 +1218,7 @@ export default function ChatClient({
                     <button 
                       type="submit"
                       disabled={isSending || (!input.trim() && attachments.length === 0)}
-                      className="p-3.5 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition shrink-0"
+                      className="p-3 bg-amber-500 hover:bg-amber-400 text-black rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95 shrink-0 shadow-[0_0_15px_rgba(245,158,11,0.2)]"
                     >
                       {isSending ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
                     </button>
@@ -1234,29 +1232,29 @@ export default function ChatClient({
 
       {/* Slideout Search Panel */}
       {showSearch && (
-        <div className="w-[300px] h-full bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 flex flex-col z-30 shrink-0">
-          <div className="p-4 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between shrink-0">
-            <h3 className="font-bold text-zinc-900 dark:text-zinc-50">Search Messages</h3>
-            <button onClick={() => setShowSearch(false)} className="p-1 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded transition text-zinc-400">
+        <div className="w-[300px] h-full bg-zinc-900/60 border-l border-white/5 flex flex-col z-30 shrink-0 backdrop-blur-xl animate-in slide-in-from-right duration-300">
+          <div className="p-4 border-b border-white/5 flex items-center justify-between shrink-0 bg-white/[0.01]">
+            <h3 className="font-bold text-white text-sm">Search Messages</h3>
+            <button onClick={() => setShowSearch(false)} className="p-1 hover:bg-white/5 border border-white/10 rounded-lg transition text-white/40 hover:text-white">
               <X className="w-4 h-4" />
             </button>
           </div>
-          <div className="p-4 border-b border-zinc-200 dark:border-zinc-800 flex gap-2 shrink-0">
+          <div className="p-4 border-b border-white/5 flex gap-2 shrink-0">
             <input 
               type="text" 
               placeholder="Search query..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-1 bg-zinc-100 dark:bg-zinc-800 rounded px-3 py-1.5 text-xs outline-none text-zinc-900 dark:text-zinc-50"
+              className="flex-1 bg-white/5 border border-white/10 focus:border-amber-500 rounded-xl px-3 py-2 text-xs outline-none text-white transition-all placeholder:text-white/30"
               onKeyDown={(e) => e.key === "Enter" && executeSearch()}
             />
-            <button onClick={executeSearch} className="px-3 py-1.5 bg-indigo-600 text-white text-xs font-bold rounded">
+            <button onClick={executeSearch} className="px-3.5 py-2 bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold rounded-xl transition-all shadow-[0_0_10px_rgba(245,158,11,0.2)]">
               Find
             </button>
           </div>
           <div className="flex-1 overflow-y-auto p-4 space-y-3">
             {searchResults.length === 0 ? (
-              <p className="text-xs text-center text-zinc-500 py-8">No results found.</p>
+              <p className="text-xs text-center text-white/30 py-8">No results found.</p>
             ) : (
               searchResults.map((res) => (
                 <div 
@@ -1265,12 +1263,12 @@ export default function ChatClient({
                     document.getElementById(`msg-${res.id}`)?.scrollIntoView({ behavior: "smooth" });
                     setShowSearch(false);
                   }}
-                  className="p-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-100 dark:border-zinc-850 rounded-lg cursor-pointer hover:bg-indigo-50/30 dark:hover:bg-indigo-950/10 transition"
+                  className="p-3 bg-white/[0.01] border border-white/5 rounded-xl cursor-pointer hover:bg-white/5 transition-colors duration-300"
                 >
-                  <p className="font-bold text-[10px] text-zinc-500 mb-1">
+                  <p className="font-bold text-[9px] text-white/40 mb-1">
                     @{res.sender?.profile?.username || "user"} • {new Date(res.createdAt).toLocaleDateString('en-US')}
                   </p>
-                  <p className="text-xs text-zinc-700 dark:text-zinc-300 break-words">{res.content}</p>
+                  <p className="text-xs text-white/80 break-words leading-relaxed">{res.content}</p>
                 </div>
               ))
             )}
@@ -1280,21 +1278,25 @@ export default function ChatClient({
 
       {/* Slideout Shared Media Gallery Panel */}
       {showGallery && (
-        <div className="w-[320px] h-full bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 flex flex-col z-30 shrink-0">
-          <div className="p-4 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between shrink-0">
-            <h3 className="font-bold text-zinc-900 dark:text-zinc-50">Shared Gallery</h3>
-            <button onClick={() => setShowGallery(false)} className="p-1 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded transition text-zinc-400">
+        <div className="w-[320px] h-full bg-zinc-900/60 border-l border-white/5 flex flex-col z-30 shrink-0 backdrop-blur-xl animate-in slide-in-from-right duration-300">
+          <div className="p-4 border-b border-white/5 flex items-center justify-between shrink-0 bg-white/[0.01]">
+            <h3 className="font-bold text-white text-sm">Shared Gallery</h3>
+            <button onClick={() => setShowGallery(false)} className="p-1 hover:bg-white/5 border border-white/10 rounded-lg transition text-white/40 hover:text-white">
               <X className="w-4 h-4" />
             </button>
           </div>
           
           {/* Gallery Tabs */}
-          <div className="flex border-b border-zinc-200 dark:border-zinc-800 text-[10px] font-bold shrink-0">
+          <div className="flex border-b border-white/5 text-[10px] font-bold shrink-0 bg-white/[0.005]">
             {["IMAGES", "VIDEOS", "FILES"].map((tab) => (
               <button 
                 key={tab}
                 onClick={() => setGalleryTab(tab as any)}
-                className={`flex-1 py-3 text-center border-b transition ${galleryTab === tab ? 'border-b-2 border-indigo-600 text-indigo-600 dark:text-indigo-400' : 'text-zinc-500'}`}
+                className={`flex-1 py-3 text-center border-b transition-all duration-300 relative ${
+                  galleryTab === tab 
+                    ? 'text-amber-500 border-amber-500' 
+                    : 'text-white/40 border-transparent hover:text-white/70'
+                }`}
               >
                 {tab}
               </button>
@@ -1312,9 +1314,9 @@ export default function ChatClient({
                     <div 
                       key={att.id} 
                       onClick={() => setSelectedImagePreview(att.url)}
-                      className="aspect-square bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden cursor-zoom-in"
+                      className="aspect-square bg-white/5 border border-white/10 rounded-xl overflow-hidden cursor-zoom-in group relative"
                     >
-                      <img src={att.url} alt="" className="w-full h-full object-cover" />
+                      <img src={att.url} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                     </div>
                   ))}
               </div>
@@ -1327,7 +1329,7 @@ export default function ChatClient({
                   .flatMap(m => m.attachments || [])
                   .filter(att => att.type === "VIDEO")
                   .map((att: any) => (
-                    <video key={att.id} src={att.url} controls className="w-full rounded-lg bg-black border border-zinc-200 dark:border-zinc-800 max-h-36" />
+                    <video key={att.id} src={att.url} controls className="w-full rounded-xl bg-black border border-white/10 max-h-36 shadow-lg" />
                   ))}
               </div>
             )}
@@ -1339,10 +1341,10 @@ export default function ChatClient({
                   .flatMap(m => m.attachments || [])
                   .filter(att => att.type === "FILE")
                   .map((att: any) => (
-                    <div key={att.id} className="flex items-center gap-2 p-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 rounded-lg text-xs truncate">
-                      <File className="w-4 h-4 text-zinc-500 shrink-0" />
-                      <span className="flex-1 truncate">{att.name || "Attachment"}</span>
-                      <a href={att.url} download className="text-indigo-600 font-bold shrink-0">Get</a>
+                    <div key={att.id} className="flex items-center gap-2.5 p-3 bg-white/[0.01] border border-white/5 rounded-xl text-xs truncate">
+                      <File className="w-4 h-4 text-white/40 shrink-0" />
+                      <span className="flex-1 truncate text-white">{att.name || "Attachment"}</span>
+                      <a href={att.url} download className="text-amber-500 font-bold hover:text-amber-400 shrink-0 transition-colors">Get</a>
                     </div>
                   ))}
               </div>

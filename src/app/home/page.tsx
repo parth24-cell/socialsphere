@@ -7,7 +7,7 @@ import Link from "next/link";
 import { User, LogOut, Settings, Home, Search, Bell, Mail } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import FollowButton from "@/components/FollowButton";
-
+import { AppLayout } from "@/components/navigation/AppLayout";
 export default async function HomePage() {
   const session = await auth();
 
@@ -128,57 +128,12 @@ export default async function HomePage() {
   }, {} as Record<string, any[]>);
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
-      <div className="max-w-7xl mx-auto flex justify-center">
-        
-        {/* Left Sidebar (Desktop) */}
-        <div className="hidden sm:flex flex-col w-64 p-2 xl:p-4 h-screen sticky top-0 border-r border-zinc-200 dark:border-zinc-800">
-          <Link href="/home" className="text-2xl font-bold text-indigo-600 dark:text-indigo-500 mb-8 px-4 mt-2">
-            SocialSphere
-          </Link>
-          
-          <nav className="flex-1 space-y-1">
-            <Link href="/home" className="flex items-center gap-4 px-4 py-3 rounded-full bg-zinc-200 dark:bg-zinc-800 font-semibold text-zinc-900 dark:text-zinc-50">
-              <Home className="w-6 h-6" /> Home
-            </Link>
-            <Link href="/explore" className="flex items-center gap-4 px-4 py-3 rounded-full hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50 font-medium text-zinc-700 dark:text-zinc-300 transition">
-              <Search className="w-6 h-6" /> Explore
-            </Link>
-            <Link href="/notifications" className="flex items-center gap-4 px-4 py-3 rounded-full hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50 font-medium text-zinc-700 dark:text-zinc-300 transition">
-              <Bell className="w-6 h-6" /> Notifications
-            </Link>
-            <Link href="/messages" className="flex items-center gap-4 px-4 py-3 rounded-full hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50 font-medium text-zinc-700 dark:text-zinc-300 transition">
-              <Mail className="w-6 h-6" /> Messages
-            </Link>
-            <Link href={`/${currentProfile?.username}`} className="flex items-center gap-4 px-4 py-3 rounded-full hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50 font-medium text-zinc-700 dark:text-zinc-300 transition">
-              <User className="w-6 h-6" /> Profile
-            </Link>
-            <Link href="/settings" className="flex items-center gap-4 px-4 py-3 rounded-full hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50 font-medium text-zinc-700 dark:text-zinc-300 transition">
-              <Settings className="w-6 h-6" /> Settings
-            </Link>
-          </nav>
-          
-          <div className="mt-auto mb-4 px-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex flex-shrink-0 items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold overflow-hidden">
-                {currentProfile?.avatarUrl ? (
-                  <img src={currentProfile.avatarUrl} alt="" className="w-full h-full object-cover object-center" />
-                ) : (
-                  currentProfile?.username?.charAt(0).toUpperCase() || "U"
-                )}
-              </div>
-              <div className="flex-1 overflow-hidden">
-                <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50 truncate">{currentProfile?.displayName || currentProfile?.username}</p>
-                <p className="text-xs text-zinc-500 truncate">@{currentProfile?.username}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
+    <AppLayout user={session.user as any}>
+      <div className="flex w-full justify-center max-w-7xl mx-auto gap-8 px-4 sm:px-6">
         {/* Main Feed Area */}
-        <main className="flex-1 max-w-[700px] w-full min-h-screen border-r border-zinc-200 dark:border-zinc-800">
-          <div className="sticky top-0 z-10 bg-zinc-50/80 dark:bg-zinc-950/80 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-800 px-4 py-3">
-            <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-50">Home</h1>
+        <div className="flex-1 max-w-[660px] w-full min-h-screen">
+          <div className="sticky top-0 z-10 bg-background/60 backdrop-blur-xl border-b border-white/5 py-4 flex items-center justify-between">
+            <h1 className="text-xl font-bold tracking-tight text-white font-heading">Home</h1>
           </div>
           
           <StoriesBar 
@@ -187,42 +142,42 @@ export default async function HomePage() {
             currentUserProfile={currentProfile} 
           />
 
-          <div className="p-0 sm:p-2 border-b border-zinc-200 dark:border-zinc-800">
+          <div className="py-6">
             <ComposePost />
           </div>
-          <div className="p-0 sm:p-4">
+          
+          <div className="py-2">
             <ClientFeedList 
               initialPosts={rankedPosts} 
               currentUserId={session.user.id!} 
               suggestedUsers={top10Suggested}
             />
           </div>
-        </main>
+        </div>
 
         {/* Right Sidebar (Trends/Suggestions) */}
-        <div className="hidden lg:block w-[350px] p-4 h-screen sticky top-0">
-          
-          <div className="bg-white dark:bg-zinc-900 rounded-2xl p-4 border border-zinc-200 dark:border-zinc-800 shadow-sm mb-4">
-            <h2 className="font-bold text-lg text-zinc-900 dark:text-zinc-50 mb-4">Who to follow</h2>
+        <div className="hidden lg:block w-[320px] py-6 h-screen sticky top-0 space-y-6">
+          <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-5 shadow-lg">
+            <h2 className="font-bold text-sm uppercase tracking-wider text-white/50 mb-4">Who to follow</h2>
             <div className="space-y-4">
               {top3Suggested.length === 0 ? (
-                <p className="text-sm text-zinc-500">No suggestions right now.</p>
+                <p className="text-xs text-white/40">No suggestions right now.</p>
               ) : (
                 top3Suggested.map(u => (
-                  <div key={u.id} className="flex items-center justify-between gap-2">
-                    <Link href={`/${u.profile?.username}`} className="flex items-center gap-2 flex-1 min-w-0">
-                      <div className="w-10 h-10 rounded-full bg-zinc-200 dark:bg-zinc-800 overflow-hidden flex-shrink-0">
+                  <div key={u.id} className="flex items-center justify-between gap-3">
+                    <Link href={`/${u.profile?.username}`} className="flex items-center gap-2.5 flex-1 min-w-0">
+                      <div className="w-9 h-9 rounded-full bg-white/5 border border-white/10 overflow-hidden flex-shrink-0">
                         {u.profile?.avatarUrl ? (
-                          <img src={u.profile.avatarUrl} alt="" className="w-full h-full object-cover object-center" />
+                          <img src={u.profile.avatarUrl} alt="" className="w-full h-full object-cover" />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center font-bold text-zinc-500">
+                          <div className="w-full h-full flex items-center justify-center font-bold text-white/30 text-sm">
                             {u.profile?.username.charAt(0).toUpperCase()}
                           </div>
                         )}
                       </div>
                       <div className="min-w-0">
-                        <p className="font-bold text-sm text-zinc-900 dark:text-zinc-50 truncate">{u.profile?.displayName || u.profile?.username}</p>
-                        <p className="text-xs text-zinc-500 truncate">@{u.profile?.username}</p>
+                        <p className="font-bold text-xs text-white truncate hover:underline">{u.profile?.displayName || u.profile?.username}</p>
+                        <p className="text-[10px] text-white/40 truncate">@{u.profile?.username}</p>
                       </div>
                     </Link>
                     <FollowButton targetUserId={u.id} initialIsFollowing={false} />
@@ -232,24 +187,23 @@ export default async function HomePage() {
             </div>
           </div>
 
-          <div className="bg-white dark:bg-zinc-900 rounded-2xl p-4 border border-zinc-200 dark:border-zinc-800 shadow-sm mb-4">
-            <h2 className="font-bold text-lg text-zinc-900 dark:text-zinc-50 mb-4">What's happening</h2>
+          <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-5 shadow-lg">
+            <h2 className="font-bold text-sm uppercase tracking-wider text-white/50 mb-4 font-heading">What's happening</h2>
             <div className="space-y-4">
               <div>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400">Trending</p>
-                <p className="font-bold text-sm text-zinc-900 dark:text-zinc-50">#Nextjs</p>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400">10.5K posts</p>
+                <p className="text-[10px] text-white/40 uppercase font-semibold">Trending</p>
+                <p className="font-bold text-xs text-white mt-0.5 hover:underline cursor-pointer">#Nextjs</p>
+                <p className="text-[10px] text-white/40 mt-0.5">10.5K posts</p>
               </div>
               <div>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400">Technology</p>
-                <p className="font-bold text-sm text-zinc-900 dark:text-zinc-50">Prisma ORM</p>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400">5.2K posts</p>
+                <p className="text-[10px] text-white/40 uppercase font-semibold">Technology</p>
+                <p className="font-bold text-xs text-white mt-0.5 hover:underline cursor-pointer">Prisma ORM</p>
+                <p className="text-[10px] text-white/40 mt-0.5">4.2K posts</p>
               </div>
             </div>
           </div>
         </div>
-        
       </div>
-    </div>
+    </AppLayout>
   );
 }

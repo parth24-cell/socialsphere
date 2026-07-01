@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Search } from "lucide-react";
+import { Search, Sparkles } from "lucide-react";
 import FollowButton from "@/components/FollowButton";
 
 type UserItem = {
@@ -29,50 +29,55 @@ export default function UserList({
   );
 
   return (
-    <div>
-      <div className="p-4 border-b border-zinc-200 dark:border-zinc-800">
+    <div className="space-y-4">
+      {/* Search Input */}
+      <div className="p-4 border-b border-white/5 select-none bg-white/[0.002]">
         <div className="relative">
-          <Search className="w-5 h-5 absolute left-3 top-2.5 text-zinc-400" />
+          <Search className="w-4 h-4 absolute left-4 top-3.5 text-white/40" />
           <input
             type="text"
             placeholder="Search users..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="w-full bg-zinc-100 dark:bg-zinc-800 border-none rounded-lg py-2.5 pl-10 pr-4 text-sm outline-none focus:ring-2 focus:ring-indigo-500 transition"
+            className="w-full bg-white/5 border border-white/10 focus:border-amber-500 rounded-xl py-3 pl-11 pr-4 text-xs text-white outline-none transition-all placeholder:text-white/30"
           />
         </div>
       </div>
       
-      <div className="divide-y divide-zinc-200 dark:divide-zinc-800">
+      {/* Users List */}
+      <div className="divide-y divide-white/5 px-6">
         {filtered.length === 0 ? (
-          <div className="p-8 text-center text-zinc-500">No users found.</div>
+          <div className="p-12 text-center text-white/30 text-xs">No users found.</div>
         ) : (
           filtered.map((u) => (
-            <div key={u.id} className="p-4 flex items-center justify-between hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition">
-              <Link href={`/${u.username}`} className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-zinc-200 dark:bg-zinc-800 overflow-hidden flex-shrink-0">
+            <div 
+              key={u.id} 
+              className="py-4 flex items-center justify-between hover:bg-white/[0.01] border-b border-transparent hover:border-white/5 transition-all duration-300 rounded-2xl px-3"
+            >
+              <Link href={`/${u.username}`} className="flex items-center gap-3.5 flex-1 min-w-0">
+                <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 overflow-hidden flex-shrink-0 flex items-center justify-center font-bold text-white/40 text-sm">
                   {u.avatarUrl ? (
                     <img src={u.avatarUrl} alt="Avatar" className="w-full h-full object-cover object-center" />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center font-bold text-zinc-500">
-                      {u.username.charAt(0).toUpperCase()}
-                    </div>
+                    u.username.charAt(0).toUpperCase()
                   )}
                 </div>
-                <div className="flex flex-col">
-                  <p className="font-bold text-zinc-900 dark:text-zinc-50 leading-tight">
+                <div className="flex flex-col min-w-0">
+                  <p className="font-bold text-white leading-tight truncate hover:underline text-sm sm:text-base">
                     {u.displayName || u.username}
                   </p>
-                  <p className="text-sm text-zinc-500">@{u.username}</p>
+                  <p className="text-[11px] text-white/40 font-mono mt-0.5">@{u.username}</p>
                   {u.isMutual && (
-                    <span className="text-xs text-indigo-600 dark:text-indigo-400 mt-0.5 font-medium">
-                      Follows you
+                    <span className="inline-flex items-center gap-1 text-[9px] uppercase tracking-wider text-amber-500 font-bold mt-1 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-lg w-max">
+                      <Sparkles className="w-2.5 h-2.5" /> Follows you
                     </span>
                   )}
                 </div>
               </Link>
               {currentUserId && currentUserId !== u.id && (
-                <FollowButton targetUserId={u.id} initialIsFollowing={u.isFollowing} />
+                <div className="shrink-0 pl-4 select-none">
+                  <FollowButton targetUserId={u.id} initialIsFollowing={u.isFollowing} />
+                </div>
               )}
             </div>
           ))

@@ -6,13 +6,17 @@ import { ThemeProvider } from "next-themes";
 import { Toaster } from "sonner";
 import { PusherProvider } from "@/components/PusherProvider";
 
+import { TooltipProvider } from "@/components/ui/tooltip";
+
 export function Providers({ children }: { children: ReactNode }) {
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+    <ThemeProvider attribute="class" defaultTheme="dark" forcedTheme="dark">
       <SessionProvider>
         <PusherProvider>
-          {children}
-          <Toaster richColors position="top-right" />
+          <TooltipProvider>
+            {children}
+            <Toaster richColors position="top-right" />
+          </TooltipProvider>
         </PusherProvider>
       </SessionProvider>
     </ThemeProvider>

@@ -4,12 +4,16 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { OTPInput } from "input-otp";
-import { Eye, EyeOff, Check, X, Loader2 } from "lucide-react";
+import { Check, X, Loader2, ArrowRight, ArrowLeft } from "lucide-react";
 import { checkUsernameAvailability, checkEmailAvailability, verifyUserOTP, sendVerificationOTP } from "@/actions/auth-v2";
+import { AuthLayout } from "@/components/auth/AuthLayout";
+import { AuthInput } from "@/components/auth/AuthInput";
+import { PasswordInput } from "@/components/auth/PasswordInput";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [step, setStep] = useState<1 | 2>(1);
+  const [step, setStep] = useState<1 | 2 | 3>(1);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
@@ -26,10 +30,6 @@ export default function RegisterPage() {
   const [usernameMsg, setUsernameMsg] = useState("");
   const [emailStatus, setEmailStatus] = useState<"idle" | "loading" | "valid" | "invalid">("idle");
   const [emailMsg, setEmailMsg] = useState("");
-  
-  // Password Visibility
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // OTP State
   const [otp, setOtp] = useState("");
@@ -70,7 +70,7 @@ export default function RegisterPage() {
         const res = await checkEmailAvailability(email);
         if (res.available) {
           setEmailStatus("valid");
-          setEmailMsg("Email is available");
+          setEmailMsg("");
         } else {
           setEmailStatus("invalid");
           setEmailMsg(res.error || "Email is already registered");
@@ -83,14 +83,20 @@ export default function RegisterPage() {
     }
   }, [email]);
 
-  const passwordStrength = () => {
-    let score = 0;
-    if (password.length >= 8) score++;
-    if (/[A-Z]/.test(password)) score++;
-    if (/[a-z]/.test(password)) score++;
-    if (/[0-9]/.test(password)) score++;
-    if (/[^A-Za-z0-9]/.test(password)) score++;
-    return score;
+  const nextStep = () => {
+    setError("");
+    if (step === 1) {
+      if (!name || usernameStatus !== "valid") {
+        setError("Please provide a valid name and username.");
+        return;
+      }
+      setStep(2);
+    }
+  };
+
+  const prevStep = () => {
+    setError("");
+    if (step === 2) setStep(1);
   };
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -117,7 +123,7 @@ export default function RegisterPage() {
       const data = await res.json();
       if (res.ok) {
         setUserId(data.userId);
-        setStep(2);
+        setStep(3);
         setResendCooldown(60);
       } else {
         setError(data.message || "Registration failed");
@@ -168,132 +174,209 @@ export default function RegisterPage() {
     }
   };
 
-  const strScore = passwordStrength();
-
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-50 dark:bg-zinc-950 p-4">
-      <div className="w-full max-w-md space-y-8 rounded-xl bg-white dark:bg-zinc-900 p-8 shadow-md border border-zinc-200 dark:border-zinc-800">
-        
-        {step === 1 && (
-          <>
-            <div className="text-center">
-              <h2 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">Create an Account</h2>
-              <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">Join SocialSphere today</p>
-            </div>
+    <AuthLayout>
+      <div className="text-center mb-8">
+        <h2 className="text-3xl font-bold tracking-tight text-white mb-2">
+          {step === 1 && "Create Account"}
+          {step === 2 && "Secure Account"}
+          {step === 3 && "Verify Email"}
+        </h2>
+        <p className="text-white/60">
+          {step === 1 && "Start your journey on SocialSphere"}
+          {step === 2 && "Set up your login credentials"}
+          {step === 3 && `We sent a code to ${email}`}
+        </p>
+      </div>
 
-            <form className="space-y-4" onSubmit={handleRegister}>
-              {error && <div className="text-red-500 text-sm text-center font-medium bg-red-50 dark:bg-red-900/20 p-3 rounded-md">{error}</div>}
-              
-              <div>
-                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">Name</label>
-                <input type="text" required value={name} onChange={e => setName(e.target.value)} className="mt-1 block w-full rounded-md border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 px-3 py-2 text-zinc-900 dark:text-zinc-100 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm" />
-              </div>
+      <div className="flex justify-center gap-2 mb-8">
+        <div className={`h-1.5 w-1/3 rounded-full transition-colors duration-500 ${step >= 1 ? "bg-amber-500" : "bg-white/10"}`} />
+        <div className={`h-1.5 w-1/3 rounded-full transition-colors duration-500 ${step >= 2 ? "bg-amber-500" : "bg-white/10"}`} />
+        <div className={`h-1.5 w-1/3 rounded-full transition-colors duration-500 ${step >= 3 ? "bg-amber-500" : "bg-white/10"}`} />
+      </div>
 
-              <div>
-                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">Username</label>
-                <div className="relative">
-                  <input type="text" required value={username} onChange={e => setUsername(e.target.value)} className="mt-1 block w-full rounded-md border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 px-3 py-2 text-zinc-900 dark:text-zinc-100 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm" />
-                  <div className="absolute right-3 top-2.5">
-                    {usernameStatus === "loading" && <Loader2 className="w-5 h-5 text-zinc-400 animate-spin" />}
-                    {usernameStatus === "valid" && <Check className="w-5 h-5 text-green-500" />}
-                    {usernameStatus === "invalid" && <X className="w-5 h-5 text-red-500" />}
-                  </div>
-                </div>
-                {usernameMsg && <p className={`mt-1 text-xs ${usernameStatus === "valid" ? "text-green-500" : "text-red-500"}`}>{usernameMsg}</p>}
-              </div>
+      {error && (
+        <div className="mb-6 text-red-400 text-sm text-center font-medium bg-red-500/10 border border-red-500/20 p-4 rounded-xl backdrop-blur-sm animate-in fade-in slide-in-from-top-2">
+          {error}
+        </div>
+      )}
 
-              <div>
-                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">Email address</label>
-                <div className="relative">
-                  <input type="email" required value={email} onChange={e => setEmail(e.target.value)} className="mt-1 block w-full rounded-md border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 px-3 py-2 text-zinc-900 dark:text-zinc-100 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm" />
-                  <div className="absolute right-3 top-2.5">
-                    {emailStatus === "loading" && <Loader2 className="w-5 h-5 text-zinc-400 animate-spin" />}
-                    {emailStatus === "valid" && <Check className="w-5 h-5 text-green-500" />}
-                    {emailStatus === "invalid" && <X className="w-5 h-5 text-red-500" />}
-                  </div>
-                </div>
-                {emailMsg && <p className={`mt-1 text-xs ${emailStatus === "valid" ? "text-green-500" : "text-red-500"}`}>{emailMsg}</p>}
-              </div>
+      <div className="relative">
+        <AnimatePresence mode="wait">
+          {step === 1 && (
+            <motion.div
+              key="step1"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.3 }}
+              className="space-y-5"
+            >
+              <AuthInput
+                label="Full Name"
+                type="text"
+                required
+                value={name}
+                onChange={e => setName(e.target.value)}
+                placeholder="John Doe"
+              />
 
-              <div>
-                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">Password</label>
-                <div className="relative">
-                  <input type={showPassword ? "text" : "password"} required value={password} onChange={e => setPassword(e.target.value)} className="mt-1 block w-full rounded-md border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 px-3 py-2 pr-10 text-zinc-900 dark:text-zinc-100 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm" />
-                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-2.5 text-zinc-400 hover:text-zinc-600">
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                  </button>
-                </div>
-                {password.length > 0 && (
-                  <div className="mt-2 flex gap-1 h-1.5">
-                    {[1, 2, 3, 4, 5].map((i) => (
-                      <div key={i} className={`flex-1 rounded-full ${i <= strScore ? (strScore <= 2 ? "bg-red-500" : strScore <= 4 ? "bg-yellow-500" : "bg-green-500") : "bg-zinc-200 dark:bg-zinc-700"}`} />
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">Confirm Password</label>
-                <div className="relative">
-                  <input type={showConfirmPassword ? "text" : "password"} required value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} className="mt-1 block w-full rounded-md border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 px-3 py-2 pr-10 text-zinc-900 dark:text-zinc-100 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm" />
-                  <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-2.5 text-zinc-400 hover:text-zinc-600">
-                    {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                  </button>
+              <div className="relative">
+                <AuthInput
+                  label="Username"
+                  type="text"
+                  required
+                  value={username}
+                  onChange={e => setUsername(e.target.value)}
+                  placeholder="johndoe123"
+                  error={usernameStatus === "invalid" ? usernameMsg : ""}
+                />
+                <div className="absolute right-4 top-[38px]">
+                  {usernameStatus === "loading" && <Loader2 className="w-5 h-5 text-white/40 animate-spin" />}
+                  {usernameStatus === "valid" && <Check className="w-5 h-5 text-emerald-400" />}
+                  {usernameStatus === "invalid" && <X className="w-5 h-5 text-red-400" />}
                 </div>
               </div>
 
-              <button type="submit" disabled={loading} className="mt-4 flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50">
-                {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Continue"}
-              </button>
-            </form>
+              <div className="pt-4">
+                <button
+                  type="button"
+                  onClick={nextStep}
+                  disabled={!name || usernameStatus !== "valid"}
+                  className="flex w-full justify-center items-center gap-2 rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/20 px-4 py-3.5 text-sm font-medium transition-all active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none"
+                >
+                  Continue <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            </motion.div>
+          )}
 
-            <div className="text-center text-sm mt-4">
-              <span className="text-zinc-600 dark:text-zinc-400">Already have an account? </span>
-              <Link href="/login" className="font-medium text-indigo-600 hover:text-indigo-500">Sign in</Link>
-            </div>
-          </>
-        )}
+          {step === 2 && (
+            <motion.form
+              key="step2"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.3 }}
+              className="space-y-5"
+              onSubmit={handleRegister}
+            >
+              <div className="relative">
+                <AuthInput
+                  label="Email address"
+                  type="email"
+                  required
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  error={emailStatus === "invalid" ? emailMsg : ""}
+                />
+                <div className="absolute right-4 top-[38px]">
+                  {emailStatus === "loading" && <Loader2 className="w-5 h-5 text-white/40 animate-spin" />}
+                  {emailStatus === "valid" && <Check className="w-5 h-5 text-emerald-400" />}
+                  {emailStatus === "invalid" && <X className="w-5 h-5 text-red-400" />}
+                </div>
+              </div>
 
-        {step === 2 && (
-          <>
-            <div className="text-center">
-              <h2 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">Verify Email</h2>
-              <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">We've sent a 6-digit code to {email}</p>
-            </div>
+              <PasswordInput
+                label="Password"
+                required
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                placeholder="Create a strong password"
+                showStrength
+              />
 
-            <form className="space-y-6 flex flex-col items-center" onSubmit={handleVerify}>
-              {error && <div className="text-red-500 text-sm text-center w-full font-medium bg-red-50 dark:bg-red-900/20 p-3 rounded-md">{error}</div>}
-              
-              <OTPInput 
-                maxLength={6} 
-                value={otp} 
-                onChange={setOtp} 
-                autoFocus 
+              <PasswordInput
+                label="Confirm Password"
+                required
+                value={confirmPassword}
+                onChange={e => setConfirmPassword(e.target.value)}
+                placeholder="Confirm your password"
+                error={confirmPassword && password !== confirmPassword ? "Passwords do not match" : ""}
+              />
+
+              <div className="pt-4 flex gap-3">
+                <button
+                  type="button"
+                  onClick={prevStep}
+                  className="flex items-center justify-center p-3.5 rounded-xl bg-white/5 hover:bg-white/10 text-white border border-white/10 transition-colors"
+                >
+                  <ArrowLeft className="w-5 h-5" />
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading || emailStatus !== "valid" || !password || password !== confirmPassword}
+                  className="flex-1 flex justify-center items-center rounded-xl bg-amber-500 hover:bg-amber-400 text-black px-4 py-3.5 text-sm font-bold shadow-[0_0_20px_rgba(245,158,11,0.3)] hover:shadow-[0_0_30px_rgba(245,158,11,0.5)] transition-all active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none"
+                >
+                  {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Create Account"}
+                </button>
+              </div>
+            </motion.form>
+          )}
+
+          {step === 3 && (
+            <motion.form
+              key="step3"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.3 }}
+              className="space-y-6 flex flex-col items-center"
+              onSubmit={handleVerify}
+            >
+              <OTPInput
+                maxLength={6}
+                value={otp}
+                onChange={setOtp}
                 render={({ slots }) => (
-                  <div className="flex justify-center gap-2">
+                  <div className="flex gap-2 justify-center">
                     {slots.map((slot, idx) => (
-                      <div key={idx} className={`w-12 h-12 text-lg flex items-center justify-center border ${slot.isActive ? 'border-indigo-500 ring-1 ring-indigo-500' : 'border-zinc-300 dark:border-zinc-700'} rounded-md text-zinc-900 dark:text-zinc-100 bg-transparent`}>
-                        {slot.char !== null ? slot.char : ""}
+                      <div
+                        key={idx}
+                        className={`w-12 h-14 flex items-center justify-center text-xl font-semibold rounded-xl border transition-all duration-300
+                          ${slot.isActive 
+                            ? "border-amber-500 bg-white/10 shadow-[0_0_15px_rgba(245,158,11,0.3)]" 
+                            : "border-white/20 bg-white/5"
+                          } text-white
+                        `}
+                      >
+                        {slot.char || (slot.isActive && <span className="w-0.5 h-6 bg-amber-500 animate-pulse" />)}
                       </div>
                     ))}
                   </div>
                 )}
               />
 
-              <button type="submit" disabled={loading || otp.length !== 6} className="flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50">
-                {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Verify Account"}
+              <button
+                type="submit"
+                disabled={loading || otp.length !== 6}
+                className="flex w-full justify-center items-center rounded-xl bg-amber-500 hover:bg-amber-400 text-black px-4 py-3.5 text-sm font-bold shadow-[0_0_20px_rgba(245,158,11,0.3)] hover:shadow-[0_0_30px_rgba(245,158,11,0.5)] transition-all active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none"
+              >
+                {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Verify Email"}
               </button>
 
-              <div className="text-center text-sm w-full">
-                <button type="button" onClick={handleResend} disabled={resendCooldown > 0 || loading} className="font-medium text-indigo-600 hover:text-indigo-500 disabled:opacity-50 disabled:hover:text-indigo-600">
-                  {resendCooldown > 0 ? `Resend code in ${resendCooldown}s` : "Didn't receive a code? Resend"}
-                </button>
-              </div>
-            </form>
-          </>
-        )}
-
+              <button
+                type="button"
+                onClick={handleResend}
+                disabled={resendCooldown > 0 || loading}
+                className="text-sm font-medium text-white/60 hover:text-white transition-colors disabled:opacity-50"
+              >
+                {resendCooldown > 0 ? `Resend code in ${resendCooldown}s` : "Resend code"}
+              </button>
+            </motion.form>
+          )}
+        </AnimatePresence>
       </div>
-    </div>
+
+      {step === 1 && (
+        <div className="mt-8 text-center text-sm text-white/60">
+          Already have an account?{" "}
+          <Link href="/login" className="font-medium text-amber-500 hover:text-amber-400 transition-colors">
+            Sign in
+          </Link>
+        </div>
+      )}
+    </AuthLayout>
   );
 }
