@@ -10,6 +10,7 @@ import {
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { usernameSchema } from "@/lib/validation";
+import { isEmailVerificationSkipped } from "@/lib/environment";
 
 export async function checkUsernameAvailability(username: string) {
   try {
@@ -38,6 +39,9 @@ export async function checkEmailAvailability(email: string) {
 }
 
 export async function sendVerificationOTP(identifier: string) {
+  if (isEmailVerificationSkipped()) return { success: true };
+
+
   const user = await prisma.user.findFirst({
     where: { OR: [{ email: identifier.toLowerCase() }, { id: identifier }] }
   });

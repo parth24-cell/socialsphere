@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { registerSchema } from "@/lib/validation";
 import { sendVerificationOTP } from "@/actions/auth-v2";
+import { isEmailVerificationSkipped } from "@/lib/environment";
+
 
 export async function POST(req: Request) {
   try {
@@ -35,12 +37,14 @@ export async function POST(req: Request) {
     // Hash the password
     const passwordHash = await bcrypt.hash(password, 10);
 
+    const isEmailSkipped = isEmailVerificationSkipped();
+
     // Create the user and profile
     const user = await prisma.user.create({
       data: {
         email,
         passwordHash,
-        status: "PENDING",
+        status: isEmailSkipped ? "ACTIVE" : "PENDING",
         profile: {
           create: {
             username,
@@ -50,6 +54,11 @@ export async function POST(req: Request) {
       },
     });
 
+    if (isEmailSkipped) {
+      return NextResponse.json({ message: "User registered successfully", userId: user.id, pending: false }, { status: 201 });
+    }
+
+
     // Send OTP
     const otpResult = await sendVerificationOTP(user.email);
     
@@ -58,6 +67,7 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ message: "Verification required", userId: user.id, pending: true }, { status: 201 });
+
   } catch (error: any) {
     console.error("Registration error:", error);
     return NextResponse.json({ message: "Internal server error" }, { status: 500 });

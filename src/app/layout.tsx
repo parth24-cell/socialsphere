@@ -18,6 +18,8 @@ export const metadata: Metadata = {
 };
 
 import { Providers } from "@/lib/Providers";
+import { isDevelopmentMode } from "@/lib/environment";
+import { DevelopmentBadge } from "@/components/design-system/DevelopmentBadge";
 
 export default function RootLayout({
   children,
@@ -34,6 +36,7 @@ export default function RootLayout({
         <Providers>
           {children}
         </Providers>
+        {isDevelopmentMode() && <DevelopmentBadge />}
       </body>
     </html>
   );
